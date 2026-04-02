@@ -9,7 +9,7 @@ function getSessionKey(): Uint8Array {
 	return Buffer.from(secretHex, "hex");
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	if (pathname === "/login") {
