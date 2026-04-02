@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+	--color-primary: #ec1337;
+	--color-background-light: #f8f6f6;
+	--color-background-dark: #121011;
+	--color-surface-dark: #1e1a1b;
+	--color-card-dark: #2d161a;
+	--color-border-dark: #2d2426;
+	--color-success: #0bda92;
+	--color-warning: #ff9f43;
+
+	--font-sans: "Plus Jakarta Sans", "sans-serif";
+}
+
+body {
+	min-height: max(884px, 100dvh);
+	-webkit-tap-highlight-color: transparent;
+}
+
+.ios-tab-bar {
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+}
+
+.ios-safe-bottom {
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+.ios-safe-top {
+	padding-top: env(safe-area-inset-top);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
+.hide-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+@keyframes slide {
+	0% {
+		transform: translateX(-100%);
+	}
+
+	50% {
+		transform: translateX(150%);
+	}
+
+	100% {
+		transform: translateX(150%);
+	}
+}
