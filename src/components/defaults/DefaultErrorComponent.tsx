@@ -14,9 +14,7 @@ export function DefaultErrorComponent({ error, reset }: { error: Error & { diges
 		<div className="p-6 flex flex-col items-center justify-center min-h-100 bg-red-50 text-red-900 rounded-lg border border-red-200">
 			<h2 className="text-2xl font-bold mb-2">Oups ! Quelque chose a cassé.</h2>
 
-			<p className="mb-4 font-mono text-sm bg-white p-3 rounded border">
-				{error.message || "Erreur inconnue"}
-			</p>
+			<p className="mb-4 font-mono text-sm bg-white p-3 rounded border">{error.message || "Erreur inconnue"}</p>
 
 			<div className="flex gap-4">
 				<button

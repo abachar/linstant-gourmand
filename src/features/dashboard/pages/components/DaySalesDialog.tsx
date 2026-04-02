@@ -3,8 +3,8 @@
 import { amount, datetimeLong } from "@common/format";
 import { findDaySalesAction } from "@features/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { X } from "lucide-react";
+import Link from "next/link";
 
 export const DaySalesDialog = ({ date, onClose }: { date: string; onClose: () => void }) => {
 	const { data: sales, isLoading } = useQuery({

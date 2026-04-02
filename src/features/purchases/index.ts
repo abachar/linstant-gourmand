@@ -1,3 +1,4 @@
+export type { FindAllPurchasesReturn, FindPurchaseByIdReturn } from "./actions";
 export {
 	createPurchaseAction,
 	deletePurchaseByIdAction,
@@ -6,7 +7,6 @@ export {
 	importPurchasesFromCsvAction,
 	updatePurchaseAction,
 } from "./actions";
-export type { FindAllPurchasesReturn, FindPurchaseByIdReturn } from "./actions";
 export { PurchaseCreatePage } from "./pages/PurchaseCreatePage";
 export { PurchaseEditPage } from "./pages/PurchaseEditPage";
 export { PurchaseListPage } from "./pages/PurchaseListPage";

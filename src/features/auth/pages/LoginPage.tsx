@@ -2,10 +2,10 @@
 
 import { loginAction } from "@features/auth";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { CircleX } from "lucide-react";
-import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export const LoginPage = () => {
 	const [email, setEmail] = useState("");

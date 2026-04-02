@@ -2,8 +2,8 @@
 
 import { PageLayout } from "@components/layouts";
 import { CardList, EmptyState } from "@components/ui";
-import { useRouter } from "next/navigation";
 import { ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 import type { FindSalesByRangeReturn } from "../actions";
 import { SaleCardContent, SaleListFilter } from "./components";
 

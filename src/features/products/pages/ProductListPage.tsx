@@ -3,8 +3,8 @@
 import { PageLayout } from "@components/layouts";
 import { CardList, EmptyState } from "@components/ui";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { Refrigerator } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { deleteProductByIdAction, type FindAllProductsReturn } from "../actions";
 import { ProductCardContent } from "./components";
 

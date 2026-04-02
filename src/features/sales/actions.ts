@@ -1,7 +1,14 @@
 "use server";
 
 import { addDays, addYears, endOfDay, endOfMonth, startOfDay, startOfMonth, subDays } from "date-fns";
-import { createSale, deleteSaleById, findSaleById, findSalesByRange, getDistinctClients, updateSale } from "./api.server";
+import {
+	createSale,
+	deleteSaleById,
+	findSaleById,
+	findSalesByRange,
+	getDistinctClients,
+	updateSale,
+} from "./api.server";
 
 function validFilter(filter: string) {
 	return ["upcoming", "month", "past", "all"].includes(filter) ? filter : "upcoming";

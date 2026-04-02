@@ -1,5 +1,5 @@
-import Link from "next/link";
 import clsx from "clsx";
+import Link from "next/link";
 import type { FindAllPurchasesReturn } from "../../actions";
 
 const FilterLink = ({ year, active }: { year: number; active: boolean }) => (

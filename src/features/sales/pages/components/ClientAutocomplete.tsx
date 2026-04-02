@@ -55,9 +55,7 @@ export const ClientAutocomplete = ({ value, onChange }: ClientAutocompleteProps)
 							value={entry}
 							className="px-4 py-3 cursor-pointer data-[focus]:bg-primary/5 dark:data-[focus]:bg-primary/10 transition-colors"
 						>
-							<span className="text-slate-900 dark:text-white font-medium text-sm block">
-								{entry.clientName}
-							</span>
+							<span className="text-slate-900 dark:text-white font-medium text-sm block">{entry.clientName}</span>
 							{entry.deliveryAddress && (
 								<span className="text-slate-400 dark:text-slate-500 text-xs truncate block mt-0.5">
 									{entry.deliveryAddress}

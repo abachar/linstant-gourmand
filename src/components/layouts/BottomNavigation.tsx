@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { ChartPie, LayoutDashboard, Refrigerator, ShoppingBag, ShoppingBasket } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 const NavigationLink = ({ href, label, icon }: { href: string; label: string; icon: ReactNode }) => {

@@ -1,5 +1,5 @@
-import Link from "next/link";
 import clsx from "clsx";
+import Link from "next/link";
 
 const FilterLink = ({ label, value, active }: { label: string; value: string; active: boolean }) => (
 	<Link

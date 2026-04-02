@@ -2,9 +2,9 @@
 
 import { deleteSaleByIdAction, type FindSaleByIdReturn } from "@features/sales";
 import { useMutation } from "@tanstack/react-query";
+import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
 
 export const SaleShowActions = ({ sale }: { sale: FindSaleByIdReturn }) => {
 	const router = useRouter();
