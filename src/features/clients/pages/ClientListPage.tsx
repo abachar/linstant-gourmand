@@ -9,8 +9,7 @@ import { updateClientAction } from "../actions";
 
 type Client = ListClientsReturn[number];
 
-const rowKey = (c: Pick<Client, "clientName" | "deliveryAddress">) =>
-	`${c.clientName}::${c.deliveryAddress ?? ""}`;
+const rowKey = (c: Pick<Client, "clientName" | "deliveryAddress">) => `${c.clientName}::${c.deliveryAddress ?? ""}`;
 
 export const ClientListPage = ({ clients }: { clients: ListClientsReturn }) => {
 	const router = useRouter();
@@ -142,7 +141,6 @@ export const ClientListPage = ({ clients }: { clients: ListClientsReturn }) => {
 					</div>
 				)}
 			</main>
-
 		</div>
 	);
 };
