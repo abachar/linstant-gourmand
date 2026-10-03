@@ -3,27 +3,62 @@ name: CI
 on:
   push:
     branches: [main]
+    paths: ["server/**", ".github/workflows/build.yml"]
   pull_request:
     branches: [main]
+    paths: ["server/**", ".github/workflows/build.yml"]
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  IMAGE_NAME: linstant-gourmand
-  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository_owner }}/linstant-gourmand
 
 jobs:
   check:
     name: Lint & Test
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: server
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: linstant_gourmand_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/linstant_gourmand_test
+
     steps:
       - uses: actions/checkout@v4
 
+      # pnpm version comes from "packageManager" in server/package.json
       - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: server/package.json
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
+          cache-dependency-path: server/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -31,28 +66,31 @@ jobs:
       - name: Check using Biome
         run: pnpm check
 
+      - name: Type check
+        run: pnpm typecheck
+
       - name: Tests
         run: pnpm test
 
-  publish:
-    name: Publish Docker Image
+      # The Containerfile runs the same build: fail here, not there
+      - name: Build
+        run: pnpm build
+
+  image:
+    name: Publish Image
     needs: check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,17 +98,24 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE }}
           tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long,prefix=sha-
+            # Short sha without prefix, as published before the move to server/
             type=sha,prefix=
-            type=raw,value=latest
 
-      - name: Build and push Docker image
+      - name: Build and push image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          push: true
+          context: ./server
+          file: ./server/Containerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Plain manifest, no attestation index: more predictable for `podman pull` / `podman auto-update`
+          provenance: false
+          sbom: false

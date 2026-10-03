@@ -1,0 +1,398 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		LG00000000000000000000P1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = LG00000000000000000000R0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = LG00000000000000000000T1;
+			remoteInfo = LinstantGourmand;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		LG00000000000000000000F1 /* LinstantGourmand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LinstantGourmand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		LG00000000000000000000F2 /* LinstantGourmandTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LinstantGourmandTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		LG00000000000000000000E1 /* Exceptions for "LinstantGourmand" folder in "LinstantGourmand" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = LG00000000000000000000T1 /* LinstantGourmand */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		LG00000000000000000000G1 /* LinstantGourmand */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				LG00000000000000000000E1 /* Exceptions for "LinstantGourmand" folder in "LinstantGourmand" target */,
+			);
+			path = LinstantGourmand;
+			sourceTree = "<group>";
+		};
+		LG00000000000000000000G2 /* LinstantGourmandTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LinstantGourmandTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		LG00000000000000000000B2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		LG00000000000000000000B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		LG00000000000000000000G0 = {
+			isa = PBXGroup;
+			children = (
+				LG00000000000000000000G1 /* LinstantGourmand */,
+				LG00000000000000000000G2 /* LinstantGourmandTests */,
+				LG00000000000000000000G3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		LG00000000000000000000G3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				LG00000000000000000000F1 /* LinstantGourmand.app */,
+				LG00000000000000000000F2 /* LinstantGourmandTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		LG00000000000000000000T1 /* LinstantGourmand */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = LG00000000000000000000L1 /* Build configuration list for PBXNativeTarget "LinstantGourmand" */;
+			buildPhases = (
+				LG00000000000000000000B1 /* Sources */,
+				LG00000000000000000000B2 /* Frameworks */,
+				LG00000000000000000000B3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				LG00000000000000000000G1 /* LinstantGourmand */,
+			);
+			name = LinstantGourmand;
+			productName = LinstantGourmand;
+			productReference = LG00000000000000000000F1 /* LinstantGourmand.app */;
+			productType = "com.apple.product-type.application";
+		};
+		LG00000000000000000000T2 /* LinstantGourmandTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = LG00000000000000000000L2 /* Build configuration list for PBXNativeTarget "LinstantGourmandTests" */;
+			buildPhases = (
+				LG00000000000000000000B4 /* Sources */,
+				LG00000000000000000000B5 /* Frameworks */,
+				LG00000000000000000000B6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				LG00000000000000000000D1 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				LG00000000000000000000G2 /* LinstantGourmandTests */,
+			);
+			name = LinstantGourmandTests;
+			productName = LinstantGourmandTests;
+			productReference = LG00000000000000000000F2 /* LinstantGourmandTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		LG00000000000000000000R0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					LG00000000000000000000T1 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					LG00000000000000000000T2 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = LG00000000000000000000T1;
+					};
+				};
+			};
+			buildConfigurationList = LG00000000000000000000L0 /* Build configuration list for PBXProject "LinstantGourmand" */;
+			developmentRegion = fr;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				fr,
+				Base,
+			);
+			mainGroup = LG00000000000000000000G0;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = LG00000000000000000000G3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				LG00000000000000000000T1 /* LinstantGourmand */,
+				LG00000000000000000000T2 /* LinstantGourmandTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		LG00000000000000000000B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		LG00000000000000000000B6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		LG00000000000000000000B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		LG00000000000000000000B4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		LG00000000000000000000D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = LG00000000000000000000T1 /* LinstantGourmand */;
+			targetProxy = LG00000000000000000000P1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		LG00000000000000000000C1 /* Debug configuration for PBXProject "LinstantGourmand" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		LG00000000000000000000C2 /* Release configuration for PBXProject "LinstantGourmand" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		LG00000000000000000000C3 /* Debug configuration for PBXNativeTarget "LinstantGourmand" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LinstantGourmand/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "L'Instant Gourmand";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Face ID protège l'accès à vos ventes, achats et stocks.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.crafters.linstantgourmand;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		LG00000000000000000000C4 /* Release configuration for PBXNativeTarget "LinstantGourmand" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "L'Instant Gourmand";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Face ID protège l'accès à vos ventes, achats et stocks.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.crafters.linstantgourmand;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		LG00000000000000000000C5 /* Debug configuration for PBXNativeTarget "LinstantGourmandTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.crafters.linstantgourmandTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LinstantGourmand.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LinstantGourmand";
+			};
+			name = Debug;
+		};
+		LG00000000000000000000C6 /* Release configuration for PBXNativeTarget "LinstantGourmandTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.crafters.linstantgourmandTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LinstantGourmand.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LinstantGourmand";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		LG00000000000000000000L0 /* Build configuration list for PBXProject "LinstantGourmand" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				LG00000000000000000000C1 /* Debug configuration for PBXProject "LinstantGourmand" */,
+				LG00000000000000000000C2 /* Release configuration for PBXProject "LinstantGourmand" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		LG00000000000000000000L1 /* Build configuration list for PBXNativeTarget "LinstantGourmand" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				LG00000000000000000000C3 /* Debug configuration for PBXNativeTarget "LinstantGourmand" */,
+				LG00000000000000000000C4 /* Release configuration for PBXNativeTarget "LinstantGourmand" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		LG00000000000000000000L2 /* Build configuration list for PBXNativeTarget "LinstantGourmandTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				LG00000000000000000000C5 /* Debug configuration for PBXNativeTarget "LinstantGourmandTests" */,
+				LG00000000000000000000C6 /* Release configuration for PBXNativeTarget "LinstantGourmandTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = LG00000000000000000000R0 /* Project object */;
+}
