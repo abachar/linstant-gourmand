@@ -9,25 +9,52 @@ struct ConflictsListView: View {
 
 	private var issues: [PendingMutation] { mutations.filter { $0.status != .pending } }
 
+	private func icon(for kind: EntityKind) -> String {
+		switch kind {
+		case .sale: "bag"
+		case .purchase: "basket"
+		case .product: "refrigerator"
+		}
+	}
+
 	var body: some View {
 		NavigationStack {
 			List {
 				if issues.isEmpty {
-					ContentUnavailableView("Rien à traiter", systemImage: "checkmark.circle")
+					EmptyState(systemImage: "checkmark.circle", title: "Rien à traiter")
+						.listRowBackground(Color.clear)
+						.listRowSeparator(.hidden)
 				}
 				ForEach(issues) { mutation in
 					NavigationLink {
 						ConflictDetailView(mutation: mutation)
 					} label: {
-						VStack(alignment: .leading, spacing: 2) {
-							Text(ConflictText.title(of: mutation, in: context)).font(.headline)
-							Text(ConflictText.situation(of: mutation))
-								.font(.caption)
-								.foregroundStyle(.secondary)
+						HStack(alignment: .top, spacing: Spacing.m) {
+							Image(systemName: icon(for: mutation.kind))
+								.font(.title3)
+								.foregroundStyle(Theme.accent)
+								.frame(width: 28)
+								.accessibilityHidden(true)
+							VStack(alignment: .leading, spacing: Spacing.xs) {
+								Text(ConflictText.title(of: mutation, in: context)).font(.headline)
+								Text(ConflictText.situation(of: mutation))
+									.font(.footnote)
+									.foregroundStyle(Theme.textMuted)
+								if mutation.status == .rejected {
+									StatusPill(text: "Refusé", color: Theme.danger)
+								} else {
+									StatusPill(text: "Conflit", color: Theme.warning)
+								}
+							}
 						}
+						.accessibilityElement(children: .combine)
 					}
+					.cardRow()
 				}
 			}
+			.listStyle(.insetGrouped)
+			.listRowSpacing(12)
+			.screenBackground()
 			.navigationTitle("À traiter")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
@@ -93,7 +120,7 @@ struct ConflictDetailView: View {
 					ForEach(mutation.fieldErrors.sorted(by: { $0.key < $1.key }), id: \.key) { field, message in
 						Label("\(field) : \(message)", systemImage: "exclamationmark.circle")
 							.font(.footnote)
-							.foregroundStyle(.red)
+							.foregroundStyle(Theme.danger)
 					}
 				}
 			} header: {
@@ -105,28 +132,42 @@ struct ConflictDetailView: View {
 				Section("Comparaison") {
 					ForEach(diffs) { diff in
 						VStack(alignment: .leading, spacing: 6) {
-							Text(diff.label).font(.caption.bold()).foregroundStyle(.secondary)
+							HStack(spacing: 6) {
+								if diff.differs {
+									Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Theme.warning)
+								}
+								Text(diff.label).font(.caption.bold()).foregroundStyle(Theme.textMuted)
+							}
 							HStack(alignment: .top) {
 								VStack(alignment: .leading) {
-									Text("iPhone").font(.caption2).foregroundStyle(.secondary)
+									Text("iPhone").overline()
 									Text(diff.mine)
 								}
 								.frame(maxWidth: .infinity, alignment: .leading)
 								VStack(alignment: .leading) {
-									Text("Serveur").font(.caption2).foregroundStyle(.secondary)
+									Text("Serveur").overline()
 									Text(diff.server)
 								}
 								.frame(maxWidth: .infinity, alignment: .leading)
 							}
 							.font(.subheadline)
 						}
-						.listRowBackground(diff.differs ? Color.orange.opacity(0.15) : nil)
+						.accessibilityElement(children: .combine)
+						.accessibilityLabel(
+							"\(diff.label)\(diff.differs ? ", différent" : "") : iPhone \(diff.mine), serveur \(diff.server)"
+						)
+						.listRowBackground(Rectangle().fill(diff.differs ? AnyShapeStyle(Theme.tint(Theme.warning)) : AnyShapeStyle(Theme.surface)))
 					}
 				}
 			}
 
-			Section { actions }
+			Section {
+				actions
+					.controlSize(.large)
+					.listRowBackground(Color.clear)
+			}
 		}
+		.screenBackground()
 		.navigationTitle(mutation.status == .conflict ? "Conflit" : "Refusé")
 		.navigationBarTitleDisplayMode(.inline)
 		.sheet(item: $correcting) { kind in
@@ -137,21 +178,37 @@ struct ConflictDetailView: View {
 	@ViewBuilder private var actions: some View {
 		switch (mutation.status, mutation.op, serverGone) {
 		case (.conflict, .upsert, false):
-			Button("Garder la mienne") { resolve { services.sync.keepMine(mutation) } }
-			Button("Prendre le serveur") { resolve { services.sync.takeServer(mutation) } }
-			Button("Corriger") { correcting = mutation.kind }
+			actionButton("Garder la mienne", prominent: true) { resolve { services.sync.keepMine(mutation) } }
+			actionButton("Prendre le serveur") { resolve { services.sync.takeServer(mutation) } }
+			actionButton("Corriger") { correcting = mutation.kind }
 		case (.conflict, .upsert, true):
-			Button("Recréer avec mes modifications") { resolve { services.sync.keepMine(mutation) } }
-			Button("Abandonner", role: .destructive) { resolve { services.sync.takeServer(mutation) } }
+			actionButton("Recréer avec mes modifications", prominent: true) { resolve { services.sync.keepMine(mutation) } }
+			actionButton("Abandonner", role: .destructive) { resolve { services.sync.takeServer(mutation) } }
 		case (.conflict, .delete, false):
-			Button("Supprimer quand même", role: .destructive) { resolve { services.sync.keepMine(mutation) } }
-			Button("Garder la version serveur") { resolve { services.sync.takeServer(mutation) } }
+			actionButton("Supprimer quand même", role: .destructive, prominent: true) { resolve { services.sync.keepMine(mutation) } }
+			actionButton("Garder la version serveur") { resolve { services.sync.takeServer(mutation) } }
 		case (.conflict, .delete, true):
-			Button("OK") { resolve { services.sync.keepMine(mutation) } }
+			actionButton("OK", prominent: true) { resolve { services.sync.keepMine(mutation) } }
 		case (_, .delete, _):
-			Button("Annuler la suppression") { resolve { services.sync.cancelDeletion(mutation) } }
+			actionButton("Annuler la suppression", prominent: true) { resolve { services.sync.cancelDeletion(mutation) } }
 		default:
-			Button("Corriger") { correcting = mutation.kind }
+			actionButton("Corriger", prominent: true) { correcting = mutation.kind }
+		}
+	}
+
+	@ViewBuilder private func actionButton(
+		_ title: String,
+		role: ButtonRole? = nil,
+		prominent: Bool = false,
+		action: @escaping () -> Void
+	) -> some View {
+		let button = Button(role: role, action: action) {
+			Text(title).frame(maxWidth: .infinity)
+		}
+		if prominent {
+			button.buttonStyle(.borderedProminent)
+		} else {
+			button.buttonStyle(.bordered)
 		}
 	}
 

@@ -47,22 +47,35 @@ struct SalesListView: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				Picker("Période", selection: $filter) {
-					ForEach(SaleFilter.allCases) { Text($0.label).tag($0) }
-				}
-				.pickerStyle(.segmented)
-				.listRowBackground(Color.clear)
-				.listRowInsets(EdgeInsets())
+				FilterChips(values: SaleFilter.allCases, selection: $filter) { $0.label }
+					.listRowBackground(Color.clear)
+					.listRowInsets(EdgeInsets())
+					.listRowSeparator(.hidden)
 
 				if visibleSales.isEmpty {
-					ContentUnavailableView("Aucune vente", systemImage: "bag", description: Text("Aucune vente pour cette période."))
+					EmptyState(
+						systemImage: "bag",
+						title: "Aucune vente",
+						message: "Aucune vente pour cette période.",
+						actionTitle: "Créer une vente"
+					) { isCreating = true }
+						.listRowBackground(Color.clear)
+						.listRowSeparator(.hidden)
 				}
 				ForEach(visibleSales) { sale in
 					NavigationLink(value: sale.id) {
 						SaleRow(sale: sale)
 					}
+					.navigationLinkIndicatorVisibility(.hidden)
+					.cardRow()
+					.swipeActions {
+						Button("Supprimer", role: .destructive) { services.store.delete(sale) }
+					}
 				}
 			}
+			.listStyle(.insetGrouped)
+			.listRowSpacing(12)
+			.screenBackground()
 			.navigationTitle("Ventes")
 			.navigationDestination(for: UUID.self) { id in
 				SaleDetailView(saleId: id)
@@ -82,6 +95,7 @@ struct SalesListView: View {
 					} label: {
 						Label("Nouvelle vente", systemImage: "plus")
 					}
+					.buttonStyle(.glassProminent)
 				}
 			}
 			.sheet(isPresented: $isCreating) {
@@ -95,22 +109,42 @@ struct SaleRow: View {
 	let sale: Sale
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 4) {
+		VStack(alignment: .leading, spacing: Spacing.s) {
 			HStack {
-				Text(sale.clientName).font(.headline)
-				SyncBadge(state: sale.syncState)
+				Label(Formats.dateTime(sale.deliveryDatetime), systemImage: "clock")
+					.font(.footnote)
+					.foregroundStyle(Theme.textMuted)
 				Spacer()
-				Text(sale.amount.euros).font(.headline)
+				SyncBadge(state: sale.syncState)
 			}
-			Text(Formats.dateTime(sale.deliveryDatetime))
-				.font(.subheadline)
-				.foregroundStyle(.secondary)
+			HStack(alignment: .firstTextBaseline, spacing: Spacing.m) {
+				Text(sale.clientName)
+					.font(.cardTitle)
+					.lineLimit(2)
+				Spacer(minLength: Spacing.s)
+				Text(sale.amount.euros)
+					.font(.amountCard)
+					.monospacedDigit()
+			}
 			if let address = sale.deliveryAddress {
 				Label(address, systemImage: "mappin.and.ellipse")
-					.font(.caption)
-					.foregroundStyle(.secondary)
+					.font(.subheadline)
+					.foregroundStyle(Theme.textMuted)
 					.lineLimit(1)
 			}
+			if let notes = sale.notes {
+				Text(notes)
+					.font(.subheadline.weight(.medium))
+					.lineLimit(2)
+			}
+			PaymentTiles(
+				deposit: sale.deposit,
+				depositMethod: sale.depositPaymentMethod,
+				remaining: sale.remaining,
+				remainingMethod: sale.remainingPaymentMethod,
+				total: sale.amount
+			)
 		}
+		.accessibilityElement(children: .combine)
 	}
 }

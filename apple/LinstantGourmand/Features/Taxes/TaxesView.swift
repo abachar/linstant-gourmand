@@ -16,22 +16,51 @@ struct TaxesView: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				Picker("Année", selection: $year) {
-					ForEach(years, id: \.self) { Text(String($0)).tag($0) }
-				}
+				FilterChips(values: years, selection: $year) { String($0) }
+					.listRowBackground(Color.clear)
+					.listRowInsets(EdgeInsets())
+					.listRowSeparator(.hidden)
 
 				if let report {
 					if report.value.monthlyItems.isEmpty {
-						ContentUnavailableView("Aucune vente cette année", systemImage: "chart.pie")
+						EmptyState(systemImage: "chart.pie", title: "Aucune vente cette année")
+							.listRowBackground(Color.clear)
+							.listRowSeparator(.hidden)
+					} else {
+						VStack(alignment: .leading, spacing: Spacing.xs) {
+							Text("Total \(String(year))").overline()
+							Text(report.value.monthlyItems.reduce(Decimal(0)) { $0 + $1.totalAmount }.euros)
+								.font(.amountHero)
+								.monospacedDigit()
+								.minimumScaleFactor(0.6)
+								.lineLimit(1)
+							Text("TVA : \(report.value.monthlyItems.reduce(Decimal(0)) { $0 + $1.taxAmount }.euros)")
+								.font(.subheadline.weight(.semibold))
+								.monospacedDigit()
+								.foregroundStyle(Theme.accent)
+						}
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.accessibilityElement(children: .combine)
+						.cardRow()
 					}
 					ForEach(report.value.monthlyItems) { item in
-						Section(item.monthLabel.capitalized(with: Formats.locale)) {
-							ValueRow(label: "Total encaissé", value: item.totalAmount.euros)
-							ValueRow(label: "Bancaire", value: item.bankTotalAmount.euros)
-							ValueRow(label: "Espèces", value: item.cashTotalAmount.euros)
-							ValueRow(label: "Taxes (12,3 %)", value: item.taxAmount.euros)
-								.fontWeight(.semibold)
+						VStack(alignment: .leading, spacing: Spacing.m) {
+							HStack(alignment: .firstTextBaseline) {
+								Text(item.monthLabel.capitalized(with: Formats.locale)).font(.headline.bold())
+								Spacer()
+								Text(item.totalAmount.euros)
+									.font(.amountCard)
+									.monospacedDigit()
+							}
+							HStack(spacing: Spacing.s) {
+								AmountTile(label: "Bancaire", amount: item.bankTotalAmount, style: .info)
+								AmountTile(label: "Espèces", amount: item.cashTotalAmount, style: .success)
+								AmountTile(label: "TVA 12,3 %", amount: item.taxAmount, style: .accent)
+							}
+							.fixedSize(horizontal: false, vertical: true)
 						}
+						.accessibilityElement(children: .contain)
+						.cardRow()
 					}
 					Section {
 						EmptyView()
@@ -39,11 +68,18 @@ struct TaxesView: View {
 						Text("Calculé par le serveur, à jour \(Formats.relative(report.fetchedAt)).")
 					}
 				} else if services.isOnline {
-					ProgressView()
+					LoadingCards(count: 4)
+						.listRowBackground(Color.clear)
+						.listRowSeparator(.hidden)
 				} else {
-					OfflineNotice(text: "Rapport indisponible hors ligne pour cette année.")
+					InfoBanner(kind: .offline, text: "Rapport indisponible hors ligne pour cette année.")
+						.listRowBackground(Color.clear)
+						.listRowInsets(EdgeInsets())
 				}
 			}
+			.listStyle(.insetGrouped)
+			.listRowSpacing(12)
+			.screenBackground()
 			.navigationTitle("Taxes")
 			.refreshable { await load() }
 			.task(id: year) {

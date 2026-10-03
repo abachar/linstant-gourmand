@@ -8,33 +8,64 @@ struct ClientsView: View {
 	@State private var clients: (value: [ClientDTO], fetchedAt: Date)?
 	@State private var editing: ClientDTO?
 	@State private var error: String?
+	@State private var searchText = ""
+
+	private var filtered: [ClientDTO] {
+		let query = searchText.trimmingCharacters(in: .whitespaces)
+		guard let clients else { return [] }
+		guard !query.isEmpty else { return clients.value }
+		return clients.value.filter {
+			$0.clientName.localizedCaseInsensitiveContains(query)
+				|| ($0.deliveryAddress?.localizedCaseInsensitiveContains(query) ?? false)
+		}
+	}
 
 	var body: some View {
 		List {
-			if let clients {
-				ForEach(clients.value) { client in
+			if let error {
+				InfoBanner(kind: .error, text: error)
+					.listRowBackground(Color.clear)
+					.listRowInsets(EdgeInsets())
+			}
+			if clients != nil {
+				ForEach(filtered) { client in
 					Button {
 						editing = client
 					} label: {
-						VStack(alignment: .leading, spacing: 2) {
-							HStack {
-								Text(client.clientName).font(.headline)
-								Spacer()
-								Text(client.totalAmount.formatted)
+						HStack(alignment: .top, spacing: Spacing.m) {
+							VStack(alignment: .leading, spacing: 2) {
+								HStack(alignment: .firstTextBaseline) {
+									Text(client.clientName).font(.cardTitle)
+									Spacer()
+									Text(client.totalAmount.formatted)
+										.font(.headline.bold())
+										.monospacedDigit()
+										.foregroundStyle(Theme.accent)
+								}
+								if let address = client.deliveryAddress {
+									Text(address).font(.subheadline).foregroundStyle(Theme.textMuted)
+								}
+								Text(client.orderCount <= 1 ? "\(client.orderCount) commande" : "\(client.orderCount) commandes")
+									.font(.caption)
+									.foregroundStyle(Theme.textMuted)
 							}
-							if let address = client.deliveryAddress {
-								Text(address).font(.caption).foregroundStyle(.secondary)
+							if !services.isOnline {
+								Image(systemName: "lock")
+									.foregroundStyle(Theme.textMuted)
+									.accessibilityLabel("Modification disponible en ligne uniquement")
 							}
-							Text(client.orderCount <= 1 ? "\(client.orderCount) commande" : "\(client.orderCount) commandes")
-								.font(.caption)
-								.foregroundStyle(.secondary)
 						}
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.accessibilityElement(children: .combine)
 					}
 					.tint(.primary)
 					.disabled(!services.isOnline)
+					.cardRow()
 				}
 			} else if services.isOnline {
-				ProgressView()
+				LoadingCards(count: 4)
+					.listRowBackground(Color.clear)
+					.listRowSeparator(.hidden)
 			}
 
 			Section {
@@ -47,6 +78,10 @@ struct ClientsView: View {
 				}
 			}
 		}
+		.listStyle(.insetGrouped)
+		.listRowSpacing(12)
+		.screenBackground()
+		.searchable(text: $searchText, prompt: "Rechercher un client")
 		.navigationTitle("Clients")
 		.refreshable { await load() }
 		.task {
@@ -62,6 +97,7 @@ struct ClientsView: View {
 		guard services.isOnline else { return }
 		do {
 			let value = try await services.api.clients()
+			error = nil
 			context.storeReport(value, key: "clients")
 			clients = (value, .now)
 		} catch {
@@ -98,9 +134,14 @@ private struct ClientEditView: View {
 					Text("La modification s'applique aux \(client.orderCount) vente(s) de ce client.")
 				}
 				if let error {
-					Section { Text(error).foregroundStyle(.red) }
+					Section {
+						InfoBanner(kind: .error, text: error)
+							.listRowBackground(Color.clear)
+							.listRowInsets(EdgeInsets())
+					}
 				}
 			}
+			.screenBackground()
 			.navigationTitle("Modifier le client")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {

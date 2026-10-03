@@ -11,16 +11,17 @@ struct LockView: View {
 	var body: some View {
 		VStack(spacing: 24) {
 			Spacer()
-			Image(systemName: "lock.fill")
-				.font(.system(size: 56))
-				.foregroundStyle(.tint)
-			Text("L'Instant Gourmand")
-				.font(.title.bold())
-			if let error = services.auth.lockError {
-				Text(error)
-					.font(.footnote)
-					.foregroundStyle(.secondary)
+			VStack(spacing: Spacing.m) {
+				BrandAvatar(size: 96)
+				Text("L'Instant Gourmand")
+					.font(.title.bold())
+				Text("Déverrouillez pour accéder à vos ventes")
+					.font(.subheadline)
+					.foregroundStyle(Theme.accent)
 					.multilineTextAlignment(.center)
+			}
+			if let error = services.auth.lockError {
+				InfoBanner(kind: .error, text: error)
 			}
 			Spacer()
 			Button {
@@ -33,6 +34,7 @@ struct LockView: View {
 			.controlSize(.large)
 		}
 		.padding(32)
+		.background(Theme.background.ignoresSafeArea())
 		.task(id: scenePhase) {
 			guard scenePhase == .active, !didAutoPrompt else { return }
 			didAutoPrompt = true

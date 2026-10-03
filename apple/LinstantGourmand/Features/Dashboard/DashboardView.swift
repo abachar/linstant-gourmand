@@ -19,15 +19,19 @@ struct DashboardView: View {
 	var body: some View {
 		NavigationStack {
 			ScrollView {
-				VStack(spacing: 16) {
-					monthHeader
-					MonthCalendar(month: month, sales: sales.filter { !$0.isPendingDeletion }) { day, daySales in
-						selectedDay = DaySelection(date: day, saleIds: daySales.map(\.id))
+				VStack(spacing: Spacing.l) {
+					VStack(alignment: .leading, spacing: Spacing.m) {
+						monthHeader
+						MonthCalendar(month: month, sales: sales.filter { !$0.isPendingDeletion }) { day, daySales in
+							selectedDay = DaySelection(date: day, saleIds: daySales.map(\.id))
+						}
 					}
+					.card()
 					statistics
 				}
 				.padding()
 			}
+			.scrollScreenBackground()
 			.navigationTitle("Tableau de bord")
 			.refreshable {
 				await services.sync.sync()
@@ -73,51 +77,73 @@ struct DashboardView: View {
 		}
 	}
 
+	private var isCurrentMonth: Bool {
+		Calendar.current.isDate(month, equalTo: .now, toGranularity: .month)
+	}
+
 	private var monthHeader: some View {
-		HStack {
-			Button {
-				month = Calendar.current.date(byAdding: .month, value: -1, to: month)!
-			} label: {
-				Image(systemName: "chevron.left")
-			}
-			Spacer()
-			Text(Formats.month(month)).font(.title3.bold())
-			Spacer()
-			Button {
-				month = Calendar.current.date(byAdding: .month, value: 1, to: month)!
-			} label: {
-				Image(systemName: "chevron.right")
+		VStack(alignment: .leading, spacing: Spacing.s) {
+			SectionTitle(title: "Planning des commandes")
+			HStack(spacing: Spacing.s) {
+				Text(Formats.month(month))
+					.font(.subheadline.weight(.semibold))
+					.foregroundStyle(Theme.accent)
+				Spacer()
+				if !isCurrentMonth {
+					Button("Aujourd'hui") {
+						month = Calendar.current.dateInterval(of: .month, for: .now)!.start
+					}
+					.buttonStyle(.bordered)
+					.controlSize(.small)
+				}
+				monthButton("chevron.left", label: "Mois précédent", offset: -1)
+				monthButton("chevron.right", label: "Mois suivant", offset: 1)
 			}
 		}
-		.buttonStyle(.glass)
+	}
+
+	private func monthButton(_ systemImage: String, label: String, offset: Int) -> some View {
+		Button {
+			month = Calendar.current.date(byAdding: .month, value: offset, to: month)!
+		} label: {
+			Image(systemName: systemImage)
+				.font(.footnote.weight(.semibold))
+				.frame(width: 32, height: 32)
+				.background(Theme.surfaceMuted, in: .rect(cornerRadius: 8, style: .continuous))
+				.frame(width: 44, height: 44)
+				.contentShape(.rect)
+		}
+		.buttonStyle(.plain)
+		.padding(.horizontal, -6)
+		.accessibilityLabel(label)
 	}
 
 	@ViewBuilder private var statistics: some View {
-		if let stats {
-			let value = stats.value
-			VStack(alignment: .leading, spacing: 12) {
-				Text("Ce mois-ci").font(.headline)
-				StatGrid(items: [
-					("Ventes", value.currentMonthSales),
-					("Dépenses", value.currentMonthExpenses),
-					("Taxes", value.currentMonthTax),
-				])
-				Text("Cette année").font(.headline)
-				StatGrid(items: [
-					("Ventes", value.currentYearSales),
-					("Dépenses", value.currentYearExpenses),
-					("Taxes", value.currentYearTax),
-				])
+		VStack(alignment: .leading, spacing: Spacing.m) {
+			SectionTitle(title: "Finances", badge: "Ce mois")
+			if let stats {
+				let value = stats.value
+				LazyVGrid(columns: [GridItem(.flexible(), spacing: Spacing.m), GridItem(.flexible(), spacing: Spacing.m)], spacing: Spacing.m) {
+					StatCard(title: "Chiffre d'affaires", month: value.currentMonthSales, year: value.currentYearSales)
+					StatCard(title: "Dépenses", month: value.currentMonthExpenses, year: value.currentYearExpenses)
+					StatCard(
+						title: "Bénéfice net",
+						month: value.currentMonthSales - value.currentMonthExpenses,
+						year: value.currentYearSales - value.currentYearExpenses,
+						negativeIsDanger: true
+					)
+					StatCard(title: "Taxe", month: value.currentMonthTax, year: value.currentYearTax)
+				}
 				Text("Calculé par le serveur, à jour \(Formats.relative(stats.fetchedAt)).")
 					.font(.caption)
-					.foregroundStyle(.secondary)
+					.foregroundStyle(Theme.textMuted)
+			} else if services.isOnline {
+				LoadingCards(count: 4)
+			} else {
+				InfoBanner(kind: .offline, text: "Statistiques indisponibles hors ligne pour ce mois.")
 			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-		} else if services.isOnline {
-			ProgressView()
-		} else {
-			OfflineNotice(text: "Statistiques indisponibles hors ligne pour ce mois.")
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 
 	private func loadStats() async {
@@ -130,21 +156,30 @@ struct DashboardView: View {
 	}
 }
 
-private struct StatGrid: View {
-	let items: [(String, Decimal)]
+private struct StatCard: View {
+	let title: String
+	let month: Decimal
+	let year: Decimal
+	var negativeIsDanger = false
 
 	var body: some View {
-		HStack(spacing: 8) {
-			ForEach(items, id: \.0) { label, value in
-				VStack(alignment: .leading, spacing: 4) {
-					Text(label).font(.caption).foregroundStyle(.secondary)
-					Text(value.euros).font(.subheadline.bold()).minimumScaleFactor(0.7).lineLimit(1)
-				}
-				.frame(maxWidth: .infinity, alignment: .leading)
-				.padding(12)
-				.glassEffect(in: .rect(cornerRadius: 16))
-			}
+		VStack(alignment: .leading, spacing: Spacing.xs) {
+			Text(title).overline()
+			Text(month.euros)
+				.font(.statValue)
+				.monospacedDigit()
+				.minimumScaleFactor(0.6)
+				.lineLimit(1)
+				.foregroundStyle(negativeIsDanger && month < 0 ? Theme.danger : Color.primary)
+			Text("Année : \(year.euros)")
+				.font(.caption)
+				.monospacedDigit()
+				.foregroundStyle(Theme.textMuted)
+				.minimumScaleFactor(0.8)
+				.lineLimit(1)
 		}
+		.card()
+		.accessibilityElement(children: .combine)
 	}
 }
 
@@ -186,35 +221,41 @@ private struct MonthCalendar: View {
 		let symbols = calendar.veryShortStandaloneWeekdaySymbols
 		let ordered = Array(symbols[(calendar.firstWeekday - 1)...] + symbols[..<(calendar.firstWeekday - 1)])
 
-		LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 6) {
+		LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
 			ForEach(Array(ordered.enumerated()), id: \.offset) { _, symbol in
-				Text(symbol).font(.caption.bold()).foregroundStyle(.secondary)
+				Text(symbol).overline()
 			}
 			ForEach(Array(days.enumerated()), id: \.offset) { _, day in
 				if let day {
 					let daySales = byDay[day] ?? []
+					let isToday = calendar.isDateInToday(day)
 					Button {
 						if !daySales.isEmpty { onSelect(day, daySales) }
 					} label: {
 						VStack(spacing: 2) {
 							Text("\(calendar.component(.day, from: day))")
-								.font(.callout.weight(calendar.isDateInToday(day) ? .bold : .regular))
-								.foregroundStyle(calendar.isDateInToday(day) ? Color.accentColor : .primary)
-							Circle()
-								.fill(daySales.isEmpty ? Color.clear : Color.accentColor)
-								.frame(width: 6, height: 6)
+								.font(.callout.weight(isToday || !daySales.isEmpty ? (isToday ? .bold : .semibold) : .regular))
+								.foregroundStyle(isToday ? Color.white : (daySales.isEmpty ? Theme.textMuted : Color.primary))
+								.frame(minWidth: 36, minHeight: 36)
+								.background { if isToday { Circle().fill(Theme.accent) } }
+							HStack(spacing: 2) {
+								ForEach(0..<min(daySales.count, 3), id: \.self) { _ in
+									Circle().fill(isToday ? Color.white : Theme.accent).frame(width: 5, height: 5)
+								}
+							}
+							.frame(height: 5)
 						}
-						.frame(maxWidth: .infinity, minHeight: 40)
+						.frame(maxWidth: .infinity, minHeight: 44)
+						.contentShape(.rect)
 					}
 					.buttonStyle(.plain)
 					.accessibilityLabel("\(Formats.date(day)), \(daySales.count) vente(s)")
+					.accessibilityAddTraits(daySales.isEmpty ? [] : .isButton)
 				} else {
-					Color.clear.frame(height: 40)
+					Color.clear.frame(height: 44)
 				}
 			}
 		}
-		.padding(12)
-		.glassEffect(in: .rect(cornerRadius: 20))
 	}
 }
 
@@ -230,9 +271,23 @@ private struct DaySalesSheet: View {
 
 	var body: some View {
 		NavigationStack {
-			List(sales) { sale in
-				NavigationLink(value: sale.id) { SaleRow(sale: sale) }
+			List {
+				Section {
+					ForEach(sales) { sale in
+						NavigationLink(value: sale.id) { SaleRow(sale: sale) }
+							.navigationLinkIndicatorVisibility(.hidden)
+							.cardRow()
+					}
+				} header: {
+					Text("\(sales.count) vente(s) · \(sales.reduce(Decimal(0)) { $0 + $1.amount }.euros)")
+						.font(.subheadline.weight(.semibold))
+						.foregroundStyle(Theme.textMuted)
+						.textCase(nil)
+				}
 			}
+			.listStyle(.insetGrouped)
+			.listRowSpacing(12)
+			.screenBackground()
 			.navigationTitle(Formats.date(selection.date))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationDestination(for: UUID.self) { SaleDetailView(saleId: $0) }

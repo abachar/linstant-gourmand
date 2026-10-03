@@ -38,7 +38,7 @@ struct SaleFormView: View {
 		NavigationStack {
 			Form {
 				Section("Client") {
-					TextField("Nom du client", text: $draft.clientName)
+					TextField("Nom du client (obligatoire)", text: $draft.clientName)
 						.focused($clientFieldFocused)
 						.textContentType(.name)
 					ForEach(suggestions, id: \.name) { suggestion in
@@ -47,10 +47,13 @@ struct SaleFormView: View {
 							if let address = suggestion.address { draft.deliveryAddress = address }
 							clientFieldFocused = false
 						} label: {
-							VStack(alignment: .leading) {
-								Text(suggestion.name)
-								if let address = suggestion.address {
-									Text(address).font(.caption).foregroundStyle(.secondary)
+							HStack(spacing: Spacing.m) {
+								Image(systemName: "person").foregroundStyle(Theme.textMuted)
+								VStack(alignment: .leading) {
+									Text(suggestion.name)
+									if let address = suggestion.address {
+										Text(address).font(.caption).foregroundStyle(Theme.textMuted)
+									}
 								}
 							}
 						}
@@ -75,14 +78,21 @@ struct SaleFormView: View {
 					Button {
 						draft.lines.append(SaleLineDraft())
 					} label: {
-						Label("Ajouter un article", systemImage: "plus")
+						Label {
+							Text("Ajouter un article")
+						} icon: {
+							Image(systemName: "plus.circle.fill").foregroundStyle(Theme.accent)
+						}
+					}
+					if draft.hasLines {
+						LabeledContent("Total") {
+							Text(draft.totalAmount.euros)
+								.font(.title3.weight(.heavy))
+								.monospacedDigit()
+						}
 					}
 				} header: {
 					Text("Articles")
-				} footer: {
-					if draft.hasLines {
-						Text("Total : \(draft.totalAmount.euros)").font(.headline)
-					}
 				}
 
 				Section {
@@ -93,12 +103,17 @@ struct SaleFormView: View {
 					}
 					AmountField(title: "Acompte", text: $draft.deposit)
 					PaymentMethodPicker(title: "Mode acompte", selection: $draft.depositPaymentMethod)
-					ValueRow(label: "Solde", value: draft.remainingAmount.euros)
+					LabeledContent("Solde") {
+						Text(draft.remainingAmount.euros)
+							.bold()
+							.foregroundStyle(Theme.accent)
+							.monospacedDigit()
+					}
 					PaymentMethodPicker(title: "Mode solde", selection: $draft.remainingPaymentMethod)
 				} header: {
 					Text("Paiement")
 				} footer: {
-					Text("Le solde est le total moins l'acompte.")
+					Text("Acompte proposé d'environ 30 % ; le solde est le total moins l'acompte.")
 				}
 
 				Section("Notes") {
@@ -107,6 +122,7 @@ struct SaleFormView: View {
 
 				if showsErrors { FormErrors(errors: draft.errors) }
 			}
+			.screenBackground()
 			.navigationTitle(sale == nil ? "Nouvelle vente" : "Modifier la vente")
 			.navigationBarTitleDisplayMode(.inline)
 			.onChange(of: draft.lines) { old, new in
@@ -144,14 +160,17 @@ private struct SaleLineEditor: View {
 			HStack {
 				TextField("Prix unitaire", text: $line.unitPrice)
 					.keyboardType(.decimalPad)
-				Text("€").foregroundStyle(.secondary)
+					.monospacedDigit()
+				Text("€").foregroundStyle(Theme.textMuted)
+				Spacer()
 				Stepper("× \(line.quantity)", value: $line.quantity, in: 1...10_000)
 					.fixedSize()
 			}
 			if !line.isBlank {
 				Text(line.total.euros)
-					.font(.caption)
-					.foregroundStyle(.secondary)
+					.font(.subheadline.bold())
+					.monospacedDigit()
+					.frame(maxWidth: .infinity, alignment: .trailing)
 			}
 		}
 		.padding(.vertical, 4)
@@ -163,11 +182,17 @@ struct PaymentMethodPicker: View {
 	@Binding var selection: String
 
 	var body: some View {
-		Picker(title, selection: $selection) {
-			ForEach(PaymentMethod.allCases) { Text($0.label).tag($0.rawValue) }
-			if PaymentMethod(rawValue: selection) == nil {
-				Text(selection).tag(selection)
+		VStack(alignment: .leading, spacing: Spacing.s) {
+			Text(title).font(.subheadline).foregroundStyle(Theme.textMuted)
+			Picker(title, selection: $selection) {
+				ForEach(PaymentMethod.allCases) { Text($0.label).tag($0.rawValue) }
+				if PaymentMethod(rawValue: selection) == nil {
+					Text(selection).tag(selection)
+				}
 			}
+			.pickerStyle(.segmented)
+			.labelsHidden()
 		}
+		.padding(.vertical, 2)
 	}
 }

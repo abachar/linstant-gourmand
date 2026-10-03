@@ -34,47 +34,82 @@ struct SaleDetailView: View {
 						NavigationLink {
 							ConflictDetailView(mutation: mutation)
 						} label: {
-							Label(
-								sale.syncState == .conflict ? "Modifiée ailleurs : à résoudre" : "Refusée par le serveur : à corriger",
-								systemImage: "exclamationmark.triangle.fill"
+							InfoBanner(
+								kind: .warning,
+								text: sale.syncState == .conflict ? "Modifiée ailleurs : à résoudre" : "Refusée par le serveur : à corriger"
 							)
-							.foregroundStyle(.orange)
 						}
+						.listRowBackground(Color.clear)
+						.listRowInsets(EdgeInsets())
 					}
 				}
 			}
 
-			Section("Client") {
-				ValueRow(label: "Nom", value: sale.clientName)
-				if let address = sale.deliveryAddress { ValueRow(label: "Adresse", value: address) }
-				ValueRow(label: "Livraison", value: Formats.dateTime(sale.deliveryDatetime))
+			Section {
+				VStack(alignment: .leading, spacing: Spacing.s) {
+					Text(sale.clientName).font(.title2.bold())
+					Label(Formats.dateTime(sale.deliveryDatetime), systemImage: "clock")
+						.font(.subheadline)
+						.foregroundStyle(Theme.textMuted)
+					Text(sale.amount.euros)
+						.font(.amountHero)
+						.monospacedDigit()
+					if let address = sale.deliveryAddress {
+						Label(address, systemImage: "mappin.and.ellipse")
+							.font(.subheadline)
+							.foregroundStyle(Theme.textMuted)
+					}
+					Text("Créée le \(Formats.dateTime(sale.createdAt))")
+						.font(.caption)
+						.foregroundStyle(Theme.textMuted)
+				}
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.accessibilityElement(children: .combine)
 			}
 
 			if !sale.items.isEmpty {
-				Section("Articles") {
+				Section {
 					ForEach(Array(sale.items.enumerated()), id: \.offset) { _, item in
 						HStack(alignment: .firstTextBaseline) {
-							VStack(alignment: .leading) {
-								Text(item.description)
-								Text("\(item.quantity) × \(item.unitPrice.formatted)")
+							VStack(alignment: .leading, spacing: 2) {
+								Text(item.description).font(.subheadline.weight(.medium))
+								Text("\(item.unitPrice.formatted) × \(item.quantity)")
 									.font(.caption)
-									.foregroundStyle(.secondary)
+									.monospacedDigit()
+									.foregroundStyle(Theme.textMuted)
 							}
 							Spacer()
 							Text((item.unitPrice.value * Decimal(item.quantity)).euros)
+								.font(.subheadline.bold())
+								.monospacedDigit()
 						}
+						.accessibilityElement(children: .combine)
 					}
+				} header: {
+					Text("Articles").overline()
 				}
 			}
 
-			Section("Paiement") {
-				ValueRow(label: "Total", value: sale.amount.euros)
-				ValueRow(label: "Acompte", value: "\(sale.deposit.euros) · \(PaymentMethod.label(for: sale.depositPaymentMethod))")
-				ValueRow(label: "Solde", value: "\(sale.remaining.euros) · \(PaymentMethod.label(for: sale.remainingPaymentMethod))")
+			Section {
+				PaymentTiles(
+					deposit: sale.deposit,
+					depositMethod: sale.depositPaymentMethod,
+					remaining: sale.remaining,
+					remainingMethod: sale.remainingPaymentMethod,
+					total: sale.amount,
+					large: true
+				)
+				.listRowInsets(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
+			} header: {
+				Text("Paiement").overline()
 			}
 
 			if let notes = sale.notes {
-				Section("Notes") { Text(notes) }
+				Section {
+					Text(notes)
+				} header: {
+					Text("Notes").overline()
+				}
 			}
 
 			if !sale.items.isEmpty {
@@ -82,7 +117,7 @@ struct SaleDetailView: View {
 					SalePDFButton(saleId: sale.id, clientName: sale.clientName, type: .quote, previewURL: $previewURL, error: $error)
 					SalePDFButton(saleId: sale.id, clientName: sale.clientName, type: .invoice, previewURL: $previewURL, error: $error)
 				} header: {
-					Text("Documents")
+					Text("Documents").overline()
 				} footer: {
 					if !services.isOnline {
 						OfflineNotice(text: "Les devis et factures sont générés par le serveur : disponibles en ligne uniquement.")
@@ -93,9 +128,15 @@ struct SaleDetailView: View {
 			}
 
 			Section {
-				Button("Supprimer la vente", role: .destructive) { confirmsDeletion = true }
+				Button(role: .destructive) {
+					confirmsDeletion = true
+				} label: {
+					Label("Supprimer la vente", systemImage: "trash")
+				}
 			}
 		}
+		.listStyle(.insetGrouped)
+		.screenBackground()
 		.navigationTitle(sale.clientName)
 		.navigationBarTitleDisplayMode(.inline)
 		.toolbar {

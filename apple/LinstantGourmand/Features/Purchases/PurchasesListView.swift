@@ -27,15 +27,35 @@ struct PurchasesListView: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				Section {
-					Picker("Année", selection: $year) {
-						ForEach(years, id: \.self) { Text(String($0)).tag($0) }
-					}
-					ValueRow(label: "Total", value: total.euros)
+				FilterChips(values: years, selection: $year) { String($0) }
+					.listRowBackground(Color.clear)
+					.listRowInsets(EdgeInsets())
+					.listRowSeparator(.hidden)
+
+				VStack(alignment: .leading, spacing: Spacing.xs) {
+					Text("Total \(String(year))").overline()
+					Text(total.euros)
+						.font(.amountHero)
+						.monospacedDigit()
+						.minimumScaleFactor(0.6)
+						.lineLimit(1)
+					Text(visible.count <= 1 ? "\(visible.count) achat" : "\(visible.count) achats")
+						.font(.subheadline)
+						.foregroundStyle(Theme.textMuted)
 				}
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.accessibilityElement(children: .combine)
+				.cardRow()
 
 				if visible.isEmpty {
-					ContentUnavailableView("Aucun achat", systemImage: "basket")
+					EmptyState(
+						systemImage: "basket",
+						title: "Aucun achat",
+						message: "Aucun achat pour \(String(year)).",
+						actionTitle: "Créer un achat"
+					) { isCreating = true }
+						.listRowBackground(Color.clear)
+						.listRowSeparator(.hidden)
 				}
 				ForEach(visible) { purchase in
 					Button {
@@ -44,6 +64,8 @@ struct PurchasesListView: View {
 						PurchaseRow(purchase: purchase)
 					}
 					.tint(.primary)
+					.accessibilityHint(purchase.isImported ? "Achat importé, non modifiable" : "")
+					.cardRow()
 					.swipeActions {
 						if !purchase.isImported {
 							Button("Supprimer", role: .destructive) { services.store.delete(purchase) }
@@ -51,6 +73,9 @@ struct PurchasesListView: View {
 					}
 				}
 			}
+			.listStyle(.insetGrouped)
+			.listRowSpacing(12)
+			.screenBackground()
 			.navigationTitle("Achats")
 			.refreshable { await services.sync.sync() }
 			.toolbar {
@@ -58,7 +83,7 @@ struct PurchasesListView: View {
 					Button {
 						isImporting = true
 					} label: {
-						Label("Importer un relevé Revolut", systemImage: "square.and.arrow.down")
+						Label("Importer un relevé Revolut", systemImage: "icloud.and.arrow.up")
 					}
 					.disabled(!services.isOnline)
 				}
@@ -68,6 +93,7 @@ struct PurchasesListView: View {
 					} label: {
 						Label("Nouvel achat", systemImage: "plus")
 					}
+					.buttonStyle(.glassProminent)
 				}
 			}
 			.sheet(isPresented: $isCreating) { PurchaseFormView(purchase: nil) }
@@ -102,24 +128,26 @@ struct PurchaseRow: View {
 	let purchase: Purchase
 
 	var body: some View {
-		HStack {
-			VStack(alignment: .leading, spacing: 2) {
-				HStack(spacing: 6) {
-					Text(purchase.notes ?? "Achat").lineLimit(1)
-					SyncBadge(state: purchase.syncState)
-				}
-				HStack(spacing: 6) {
-					Text(Formats.date(purchase.date))
-					if purchase.isImported {
-						Label("Importé", systemImage: "lock.fill").labelStyle(.titleAndIcon)
-					}
-				}
-				.font(.caption)
-				.foregroundStyle(.secondary)
+		VStack(alignment: .leading, spacing: Spacing.xs) {
+			HStack(spacing: 6) {
+				Text(Formats.date(purchase.date)).font(.subheadline.weight(.semibold))
+				SyncBadge(state: purchase.syncState)
+				Spacer()
+				Text(purchase.amount.euros)
+					.font(.headline.bold())
+					.monospacedDigit()
 			}
-			Spacer()
-			Text(purchase.amount.euros).monospacedDigit()
+			HStack(spacing: 6) {
+				if purchase.isImported {
+					Image(systemName: "icloud.and.arrow.down").accessibilityLabel("Importé")
+				}
+				Text(purchase.notes ?? "Achat").lineLimit(1)
+			}
+			.font(.footnote)
+			.foregroundStyle(Theme.textMuted)
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.accessibilityElement(children: .combine)
 	}
 }
 
@@ -149,6 +177,7 @@ struct PurchaseFormView: View {
 				}
 				if showsErrors { FormErrors(errors: draft.errors) }
 			}
+			.screenBackground()
 			.navigationTitle(purchase == nil ? "Nouvel achat" : "Modifier l'achat")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {

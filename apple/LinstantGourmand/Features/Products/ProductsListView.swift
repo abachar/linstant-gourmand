@@ -12,21 +12,41 @@ struct ProductsListView: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				if visible.isEmpty {
-					ContentUnavailableView("Aucun produit en stock", systemImage: "refrigerator")
-				}
-				ForEach(visible) { product in
-					Button {
-						editing = product
-					} label: {
-						ProductRow(product: product)
+				Section {
+					if visible.isEmpty {
+						EmptyState(
+							systemImage: "refrigerator",
+							title: "Aucun produit en stock",
+							actionTitle: "Ajouter le premier produit"
+						) { isCreating = true }
+							.listRowBackground(Color.clear)
+							.listRowSeparator(.hidden)
 					}
-					.tint(.primary)
-					.swipeActions {
-						Button("Supprimer", role: .destructive) { services.store.delete(product) }
+					ForEach(visible) { product in
+						Button {
+							editing = product
+						} label: {
+							ProductRow(product: product)
+						}
+						.tint(.primary)
+						.cardRow()
+						.swipeActions {
+							Button("Supprimer", role: .destructive) { services.store.delete(product) }
+						}
+					}
+				} header: {
+					HStack {
+						Text("Stock actuel").overline()
+						Spacer()
+						Text(visible.count <= 1 ? "\(visible.count) produit" : "\(visible.count) produits")
+							.font(.caption)
+							.foregroundStyle(Theme.textMuted)
 					}
 				}
 			}
+			.listStyle(.insetGrouped)
+			.listRowSpacing(12)
+			.screenBackground()
 			.navigationTitle("Stock")
 			.refreshable { await services.sync.sync() }
 			.toolbar {
@@ -35,6 +55,7 @@ struct ProductsListView: View {
 				} label: {
 					Label("Nouveau produit", systemImage: "plus")
 				}
+				.buttonStyle(.glassProminent)
 			}
 			.sheet(isPresented: $isCreating) { ProductFormView(product: nil) }
 			.sheet(item: $editing) { ProductFormView(product: $0) }
@@ -47,35 +68,54 @@ struct ProductRow: View {
 
 	private var quantityColor: Color {
 		switch product.quantity {
-		case 0: .red
-		case ..<10: .orange
-		default: .green
+		case 0: Theme.danger
+		case ..<10: Theme.warning
+		default: Theme.success
 		}
 	}
 
 	private var expirationColor: Color {
-		guard let date = product.expirationDate else { return .secondary }
-		if date < .now { return .red }
-		if date < Calendar.current.date(byAdding: .month, value: 1, to: .now)! { return .orange }
-		return .secondary
+		guard let date = product.expirationDate else { return Theme.textMuted }
+		if date < .now { return Theme.danger }
+		if date < Calendar.current.date(byAdding: .month, value: 1, to: .now)! { return Theme.warning }
+		return Theme.textMuted
+	}
+
+	private var status: (text: String, color: Color) {
+		switch product.quantity {
+		case 0: ("Rupture", Theme.danger)
+		case ..<10: ("Stock faible", Theme.warning)
+		default: ("En stock", Theme.success)
+		}
 	}
 
 	var body: some View {
-		HStack {
-			VStack(alignment: .leading, spacing: 2) {
-				HStack(spacing: 6) {
-					Text(product.productName).font(.headline)
-					SyncBadge(state: product.syncState)
-				}
-				Text(product.expirationDate.map { "DLC \(Formats.date($0))" } ?? "Pas de date limite")
-					.font(.caption)
-					.foregroundStyle(expirationColor)
+		VStack(alignment: .leading, spacing: Spacing.m) {
+			HStack(alignment: .firstTextBaseline, spacing: 6) {
+				Text(product.productName).font(.cardTitle)
+				SyncBadge(state: product.syncState)
+				Spacer()
+				Text(product.quantity <= 1 ? "\(product.quantity) unité" : "\(product.quantity) unités")
+					.font(.subheadline.bold())
+					.foregroundStyle(quantityColor)
 			}
-			Spacer()
-			Text(product.quantity <= 1 ? "\(product.quantity) unité" : "\(product.quantity) unités")
-				.font(.subheadline.bold())
-				.foregroundStyle(quantityColor)
+			HStack(alignment: .bottom, spacing: Spacing.l) {
+				VStack(alignment: .leading, spacing: 2) {
+					Text("Modifié le").overline()
+					Text(Formats.date(product.updatedAt)).font(.footnote)
+				}
+				VStack(alignment: .leading, spacing: 2) {
+					Text("Date limite").overline()
+					Text(product.expirationDate.map(Formats.date) ?? "Aucune")
+						.font(.footnote)
+						.foregroundStyle(expirationColor)
+				}
+				Spacer()
+				StatusPill(text: status.text, color: status.color)
+			}
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.accessibilityElement(children: .combine)
 	}
 }
 
@@ -106,6 +146,7 @@ struct ProductFormView: View {
 				}
 				if showsErrors { FormErrors(errors: draft.errors) }
 			}
+			.screenBackground()
 			.navigationTitle(product == nil ? "Nouveau produit" : "Modifier le produit")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {

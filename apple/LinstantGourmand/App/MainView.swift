@@ -6,7 +6,7 @@ struct MainView: View {
 
 	var body: some View {
 		TabView {
-			Tab("Tableau de bord", systemImage: "square.grid.2x2") {
+			Tab("Accueil", systemImage: "square.grid.2x2") {
 				DashboardView()
 			}
 			.badge(services.sync.issueCount)
@@ -27,11 +27,33 @@ struct MainView: View {
 				TaxesView()
 			}
 		}
-		.tabViewBottomAccessory {
-			SyncStatusBar(showsIssues: $showsIssues)
-		}
+		.modifier(SyncAccessory(showsIssues: $showsIssues))
 		.sheet(isPresented: $showsIssues) {
 			ConflictsListView()
+		}
+	}
+}
+
+/// Sync runs by itself: the accessory only shows up when something is off (offline, failure, conflicts).
+private struct SyncAccessory: ViewModifier {
+	@Environment(AppServices.self) private var services
+	@Binding var showsIssues: Bool
+
+	private var isAbnormal: Bool {
+		let sync = services.sync
+		if case .failed = sync.phase { return true }
+		return !services.isOnline || sync.phase == .offline || sync.issueCount > 0
+	}
+
+	func body(content: Content) -> some View {
+		if #available(iOS 26.1, *) {
+			content.tabViewBottomAccessory(isEnabled: isAbnormal) {
+				SyncStatusBar(showsIssues: $showsIssues)
+			}
+		} else {
+			content.tabViewBottomAccessory {
+				SyncStatusBar(showsIssues: $showsIssues)
+			}
 		}
 	}
 }
@@ -43,59 +65,45 @@ struct SyncStatusBar: View {
 
 	var body: some View {
 		let sync = services.sync
-		HStack(spacing: 10) {
-			icon
-			VStack(alignment: .leading, spacing: 0) {
-				Text(title).font(.subheadline.weight(.semibold))
-				if let subtitle {
-					Text(subtitle).font(.caption).foregroundStyle(.secondary)
-				}
-			}
+		HStack(spacing: Spacing.s) {
+			Label(title, systemImage: symbol)
+				.font(.footnote.weight(.medium))
+				.foregroundStyle(color)
+				.lineLimit(1)
 			Spacer()
 			if sync.issueCount > 0 {
 				Button("\(sync.issueCount) à traiter") { showsIssues = true }
-					.buttonStyle(.borderedProminent)
-					.tint(.orange)
-					.controlSize(.small)
-			} else {
-				Button {
-					Task { await sync.sync() }
-				} label: {
-					Image(systemName: "arrow.clockwise")
-				}
-				.disabled(!services.isOnline || sync.phase == .syncing)
-				.accessibilityLabel("Synchroniser")
+					.font(.footnote.weight(.semibold))
+					.tint(Theme.warning)
+					.frame(minHeight: 44)
+			} else if case .failed = sync.phase, services.isOnline {
+				Button("Réessayer") { Task { await sync.sync() } }
+					.font(.footnote.weight(.semibold))
+					.frame(minHeight: 44)
 			}
 		}
 		.padding(.horizontal)
 	}
 
-	@ViewBuilder private var icon: some View {
-		switch services.sync.phase {
-		case .syncing: ProgressView()
-		case .offline: Image(systemName: "wifi.slash").foregroundStyle(.secondary)
-		case .failed: Image(systemName: "exclamationmark.icloud").foregroundStyle(.orange)
-		case .idle:
-			Image(systemName: services.isOnline ? "checkmark.icloud" : "wifi.slash").foregroundStyle(.secondary)
-		}
+	private var symbol: String {
+		let sync = services.sync
+		if !services.isOnline || sync.phase == .offline { return "wifi.slash" }
+		if case .failed = sync.phase { return "exclamationmark.icloud" }
+		if sync.issueCount > 0 { return "exclamationmark.triangle" }
+		return "checkmark.icloud"
+	}
+
+	private var color: Color {
+		if case .failed = services.sync.phase, services.isOnline { return Theme.warning }
+		return Theme.textMuted
 	}
 
 	private var title: String {
 		let sync = services.sync
-		if !services.isOnline { return "Hors ligne" }
-		switch sync.phase {
-		case .syncing: return "Synchronisation…"
-		case .offline: return "Hors ligne"
-		case let .failed(message): return message
-		case .idle: return sync.pendingCount > 0 ? "Modifications en attente" : "À jour"
-		}
-	}
-
-	private var subtitle: String? {
-		let sync = services.sync
-		if sync.pendingCount > 0 {
-			return sync.pendingCount == 1 ? "1 modification à envoyer" : "\(sync.pendingCount) modifications à envoyer"
-		}
-		return sync.lastSyncAt.map { "Synchronisé \(Formats.relative($0))" }
+		let pending = sync.pendingCount == 0 ? "" : sync.pendingCount == 1 ? " · 1 modification en attente" : " · \(sync.pendingCount) modifications en attente"
+		if !services.isOnline || sync.phase == .offline { return "Hors ligne" + pending }
+		if case let .failed(message) = sync.phase { return message }
+		if sync.issueCount > 0 { return "Conflits de synchronisation" }
+		return "À jour"
 	}
 }

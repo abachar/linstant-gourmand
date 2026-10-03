@@ -33,15 +33,15 @@ struct SyncBadge: View {
 			EmptyView()
 		case .pending:
 			Image(systemName: "arrow.triangle.2.circlepath")
-				.foregroundStyle(.secondary)
+				.foregroundStyle(Theme.textMuted)
 				.accessibilityLabel("En attente de synchronisation")
 		case .conflict:
 			Image(systemName: "exclamationmark.triangle.fill")
-				.foregroundStyle(.orange)
+				.foregroundStyle(Theme.warning)
 				.accessibilityLabel("Conflit à résoudre")
 		case .rejected:
 			Image(systemName: "xmark.octagon.fill")
-				.foregroundStyle(.red)
+				.foregroundStyle(Theme.danger)
 				.accessibilityLabel("Refusé par le serveur")
 		}
 	}
@@ -54,7 +54,7 @@ struct OfflineNotice: View {
 	var body: some View {
 		Label(text, systemImage: "wifi.slash")
 			.font(.footnote)
-			.foregroundStyle(.secondary)
+			.foregroundStyle(Theme.textMuted)
 	}
 }
 
@@ -78,8 +78,8 @@ struct FormErrors: View {
 		if !errors.isEmpty {
 			Section {
 				ForEach(errors, id: \.self) { error in
-					Label(error, systemImage: "exclamationmark.circle")
-						.foregroundStyle(.red)
+					Label(error, systemImage: "exclamationmark.circle.fill")
+						.foregroundStyle(Theme.danger)
 						.font(.footnote)
 				}
 			}
@@ -98,7 +98,7 @@ struct AmountField: View {
 				TextField("0,00", text: $text)
 					.keyboardType(.decimalPad)
 					.multilineTextAlignment(.trailing)
-				Text("€").foregroundStyle(.secondary)
+				Text("€").foregroundStyle(Theme.textMuted)
 			}
 		}
 	}
@@ -121,7 +121,7 @@ struct SalePDFButton: View {
 			if isLoading {
 				ProgressView()
 			} else {
-				Label(type.label, systemImage: "doc.richtext")
+				Label(type.label, systemImage: "doc.text")
 			}
 		}
 		.disabled(!services.isOnline || isLoading)
