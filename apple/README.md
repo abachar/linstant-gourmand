@@ -63,3 +63,7 @@ Test de bout en bout contre un serveur local (désactivé par défaut, crée pui
 TEST_RUNNER_LG_LIVE_API=1 TEST_RUNNER_LG_EMAIL=… TEST_RUNNER_LG_PASSWORD=… xcodebuild test … \
   -only-testing:LinstantGourmandTests/LiveAPITests
 ```
+
+## Licence
+
+[PolyForm Strict 1.0.0](../LICENSE.md) — voir le [README principal](../README.md#licence).

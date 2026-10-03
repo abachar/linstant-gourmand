@@ -17,3 +17,13 @@ Production : https://linstant-gourmand.crafters.dev/
   du réseau. Une commande modifiée des deux côtés est signalée sur l'iPhone, qui choisit sa version, celle du
   serveur, ou corrige.
 - Verrouillage optimiste (`version`) et suppression logique (`deleted_at`) sur ventes, achats et produits.
+
+## Licence
+
+Code source consultable, **non libre** : [PolyForm Strict 1.0.0](LICENSE.md).
+
+- Autorisé : lire le code et l'utiliser à des fins non commerciales (usage personnel compris).
+- Interdit sans accord écrit de l'auteur : toute distribution (gratuite ou payante), toute modification ou
+  œuvre dérivée, tout usage commercial.
+
+Copyright © 2026 Abdelhakim Bachar - Crafters.

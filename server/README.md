@@ -200,3 +200,7 @@ Le workflow GitHub Actions (`.github/workflows/build.yml`) exécute sur chaque p
 5. Build et push de l'image vers `ghcr.io/abachar/linstant-gourmand` (`latest` + `sha-…`, sur push `main` uniquement)
 
 Le workflow ne se déclenche que si `server/` ou le workflow change (pas pour `apple/` ni `docs/`).
+
+## Licence
+
+[PolyForm Strict 1.0.0](../LICENSE.md) — voir le [README principal](../README.md#licence).
