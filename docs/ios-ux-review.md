@@ -25,7 +25,7 @@ Gravité : **G1** bloquant ou trompeur, **G2** gêne réelle, **G3** finition.
 |---|---|---|
 | **Connexion** | Form générique « Connexion » sans marque ; pas d'enchaînement e-mail → mot de passe au clavier ; bouton en ligne de Form peu visible. | G2 |
 | **Verrouillage** | Cadenas système + titre : correct mais anonyme ; erreur en `.secondary` peu visible ; aucun rappel de l'identité. | G3 |
-| **Barre de synchro** | Icône « à jour » grise : on ne distingue pas « à jour » de « hors ligne » d'un coup d'œil ; bouton de synchro sous 44 pt ; libellé VoiceOver éclaté en 3 éléments. | G2 |
+| **Barre de synchro** | Toujours visible avec un bouton de synchro, alors que la synchro est automatique et que l'état normal est « en ligne, à jour » : elle attire l'œil pour rien. Icône « à jour » grise, libellé VoiceOver éclaté en 3 éléments. | G2 |
 | **Tableau de bord** | Stats en 2 rangées de 3 petites tuiles (`subheadline`) sur verre : montants peu lisibles, pas de bénéfice net (le web l'affiche) ; calendrier sans titre, aujourd'hui marqué par la seule couleur du chiffre ; cellules de 40 pt (< 44) ; chargement = spinner nu ; libellé d'onglet « Tableau de bord » trop long pour 5 onglets. | G2 |
 | **Feuille du jour** | Liste correcte ; titre seul, aucun total du jour. | G3 |
 | **Ventes (liste)** | Ligne dense en texte : pas d'acompte/reste visibles alors que c'est l'info clé du web (qui doit encore payer quoi) ; montant au même poids que le nom ; état vide sans bouton « Créer une vente ». | G2 |
@@ -87,7 +87,8 @@ Tous les montants : `.monospacedDigit()`. Aucune taille fixe en points : tout pa
 - Rayons continus : carte 16 (web `rounded-xl` = 12 px, arrondi un peu plus pour s'accorder aux coins concentriques d'iOS 26), tuile 12, chips en capsule.
 - **Cartes** : fond `LGSurface`, bordure 1 px `LGBorder`, pas d'ombre (iOS). Dans les `List`, la carte est la ligne elle-même (`listRowBackground` + `listRowSpacing`), ce qui garde swipe, sélection et VoiceOver natifs.
 - **Fonds** : `LGBackground` sous les `List`/`Form`/`ScrollView` (`scrollContentBackground(.hidden)`). Les barres restent celles du système (verre + effet de bord de défilement) : jamais de `toolbarBackground` opaque, pas de tab bar personnalisée.
-- **Verre** : uniquement sur la couche de contrôle — boutons de toolbar (natif), barre de synchro (`tabViewBottomAccessory`, natif), boutons de navigation du calendrier (`.buttonStyle(.glass)`), bouton Face ID et bouton de connexion (`.glassProminent`). Retiré du contenu (calendrier, stats).
+- **Verre** : uniquement sur la couche de contrôle — boutons de toolbar (natif, + en `.glassProminent`), barre de synchro (`tabViewBottomAccessory`, natif), bouton Face ID et bouton de connexion (`.glassProminent`). Retiré du contenu (calendrier, stats) ; les boutons ‹ › du calendrier font partie du contenu et sont de simples carrés arrondis de 32 pt, comme sur le web.
+- **Filtres** : chips en première ligne de liste, qui défilent avec le contenu. Pas de `safeAreaBar` : l'effet de bord flou d'iOS 26 y recouvrait le titre et la première carte.
 
 ### Icônes (lucide → SF Symbols)
 
@@ -104,7 +105,8 @@ Tous les montants : `.monospacedDigit()`. Aucune taille fixe en points : tout pa
 | Clock / MapPin | `clock` / `mappin.and.ellipse` |
 | FileText | `doc.text` |
 | CreditCard / HandCoins | `creditcard` / `banknote` |
-| CloudDownload | `icloud.and.arrow.down` |
+| CloudDownload (achat importé) | `icloud.and.arrow.down` |
+| Upload (import du relevé) | `icloud.and.arrow.up` |
 | ChevronLeft / ChevronRight | `chevron.left` / `chevron.right` |
 | CircleX / Check | `xmark.circle.fill` / `checkmark` |
 
@@ -120,18 +122,18 @@ Tous les montants : `.monospacedDigit()`. Aucune taille fixe en points : tout pa
 | Écran | Améliorations | Priorité |
 |---|---|---|
 | Global | Asset catalog + `Theme` ; fond `LGBackground` partout ; couleurs d'état via tokens ; `SyncBadge`, `FormErrors`, `OfflineNotice` sur tokens. | P1 |
-| Tableau de bord | Carte « Planning des commandes » (titre + mois en accent + boutons verre ‹ › ; bouton « Aujourd'hui » hors mois courant) ; aujourd'hui = pastille pleine accent, texte blanc ; jours avec ventes en gras + jusqu'à 3 points ; cellules ≥ 44 pt ; bloc « Finances » + badge « Ce mois » ; grille 2×2 CA / Dépenses / Bénéfice net / Taxe avec valeur du mois en gros et « Année : … » ; chargement en squelette ; onglet renommé « Accueil » (titre de l'écran inchangé). | P1 |
-| Feuille du jour | Total du jour en en-tête ; lignes = `SaleRow`. | P3 |
-| Ventes | Lignes-cartes : date (horloge) + nom en gras + montant heavy, adresse, notes (2 lignes), tuiles Acompte / Reste (accent) / Total ; filtre de période en chips (comme les années) ; état vide avec « Créer une vente » ; bouton + proéminent. | P1 |
-| Fiche vente | Carte d'en-tête (nom, date, montant héros, adresse, notes) ; section Articles en sur-titre ; `PaymentTiles` ; bandeau de conflit `InfoBanner` warning ; boutons Devis/Facture en ligne avec `doc.text` ; Supprimer en bas. | P1 |
+| Tableau de bord | Carte « Planning des commandes » (titre, puis mois en accent + boutons ‹ › de 32 pt (cible 44 pt) ; bouton « Aujourd'hui » hors mois courant) ; aujourd'hui = pastille pleine accent, texte blanc ; jours avec ventes en gras + jusqu'à 3 points ; cellules ≥ 44 pt ; bloc « Finances » + badge « Ce mois » ; grille 2×2 CA / Dépenses / Bénéfice net / Taxe avec valeur du mois en gros et « Année : … » ; chargement en squelette ; onglet renommé « Accueil » (titre de l'écran inchangé). | P1 |
+| Feuille du jour | Total du jour en en-tête ; lignes = `SaleRow`, sans chevron. | P3 |
+| Ventes | Lignes-cartes : date (horloge) + nom en gras + montant heavy, adresse, notes (2 lignes), tuiles Acompte / Reste (accent) / Total ; filtre de période en chips (comme les années) ; pas de chevron ; suppression par balayage ; tuiles à hauteur égale ; état vide avec « Créer une vente » ; bouton + proéminent. | P1 |
+| Fiche vente | Carte d'en-tête (nom, date, montant héros, adresse, notes) ; section Articles en sur-titre ; `PaymentTiles` à hauteur égale ; bandeau de conflit `InfoBanner` warning ; boutons Devis/Facture en ligne avec `doc.text` ; Supprimer en bas. | P1 |
 | Formulaire vente | Ligne « Total » en gras dans la section Articles ; ligne d'article : description, puis prix + « € » + stepper + total de ligne en gras ; mode de paiement en segmenté ; solde en accent ; nom client marqué obligatoire. | P2 |
-| Achats | Chips d'année (`safeAreaBar`) ; carte de synthèse « Total {année} » + nombre d'achats ; ligne : date semibold + montant bold, description muted + icône `icloud.and.arrow.down` pour les importés + indication VoiceOver « non modifiable » ; état vide avec action. | P1 |
+| Achats | Chips d'année ; bouton d'import `icloud.and.arrow.up` ; carte de synthèse « Total {année} » + nombre d'achats ; ligne : date semibold + montant bold, description muted + icône `icloud.and.arrow.down` pour les importés + indication VoiceOver « non modifiable » ; état vide avec action. | P1 |
 | Stock | En-tête « STOCK ACTUEL · N produits » ; ligne : nom bold + quantité colorée, « Modifié le » + « Date limite » colorée, `StatusPill` Rupture / Stock faible / En stock (couleur **et** texte). | P1 |
-| Taxes | Chips d'année ; une carte par mois : mois + total heavy, 3 tuiles Bancaire (info) / Espèces (success) / TVA 12,3 % (accent) ; squelette au chargement ; carte de synthèse annuelle (somme des mois affichés, calcul d'affichage). | P1 |
+| Taxes | Chips d'année ; une carte par mois : mois + total heavy, 3 tuiles à hauteur égale Bancaire (info) / Espèces (success) / TVA 12,3 % (accent) ; squelette au chargement ; carte de synthèse annuelle (somme des mois affichés, calcul d'affichage). | P1 |
 | Clients | Erreur de chargement affichée (`InfoBanner`) ; total en accent bold ; recherche locale `.searchable` ; lignes-cartes. | P1 (erreur) / P2 |
 | À traiter | Icône du type (bag/basket/refrigerator) + `StatusPill` « Conflit » (warning) / « Refusé » (danger). | P2 |
 | Conflit | Différences : fond warning + icône `exclamationmark.triangle.fill` + libellé VoiceOver « différent » ; action recommandée en `.borderedProminent`, les autres en `.bordered`, boutons pleine largeur. | P2 |
-| Barre de synchro | Icône « à jour » en success ; erreur en warning ; bouton de synchro 44 pt ; libellé VoiceOver combiné. | P2 |
+| Barre de synchro | Masquée quand tout va bien (`tabViewBottomAccessory(isEnabled:)`, iOS 26.1). Visible seulement hors ligne (avec le nombre de modifications en attente), en échec (« Réessayer ») ou en conflit (« N à traiter ») ; une ligne discrète, sans bouton de synchro (tirer pour rafraîchir et le menu « Plus » restent). | P2 |
 | Connexion | En-tête de marque (avatar cerclé d'accent, « L'Instant Gourmand », « Accédez à votre espace d'administration » en accent) ; e-mail → mot de passe au clavier (`.submitLabel`) ; bouton `.glassProminent` pleine largeur ; erreur en `InfoBanner`. | P2 |
 | Verrouillage | Avatar cerclé d'accent + titre + sous-titre ; erreur lisible ; fond `LGBackground`. | P3 |
 
@@ -145,26 +147,27 @@ Tous les montants : `.monospacedDigit()`. Aucune taille fixe en points : tout pa
 
 ### Implémenté
 
-- **Système** : 8 colorsets `LG*` + `AccentColor` adaptatif, image `Avatar` (300×300, copiée de `server/public/images/salma.jpeg`), `Core/UI/Theme.swift` (couleurs, espacements, rayons, polices, `.screenBackground()`, `.card()`, `.cardRow()`, `.overline()`), `Core/UI/DesignSystem.swift` (`SectionTitle`, `AmountTile`, `PaymentTiles`, `StatusPill`, `EmptyState`, `FilterChips`, `InfoBanner`, `BrandAvatar`, `LoadingCards`). `SyncBadge`, `OfflineNotice`, `FormErrors` sur tokens.
-- **Écrans** : toutes les améliorations P1 à P3 du tableau ci-dessus, sur les 14 fichiers de vues. Le filtre des ventes et les chips d'année (achats, taxes) sont en première ligne de liste.
-- **Logique** : aucun fichier de `Core/API`, `Core/Sync`, `Core/Domain`, `Core/Persistence`, `Core/Auth`, `AppServices.swift`, des tests ni de `server/` modifié. Calculs ajoutés, tous d'affichage : bénéfice net, total du jour, totaux annuels des taxes, compteurs, recherche locale des clients.
-- **Vérification** : `xcodebuild build` OK sans warning dans nos fichiers ; `xcodebuild test` OK, 30 tests réussis + 1 ignoré (`LiveAPITests`, désactivé par défaut), identique à l'état de départ.
+- **Système** : 8 colorsets `LG*` + `AccentColor` adaptatif, image `Avatar` (300×300, copiée de `server/public/images/salma.jpeg`), `Core/UI/Theme.swift` (couleurs, `TintStyle`, espacements, rayons, polices, `.screenBackground()`, `.card()`, `.cardRow()`, `.overline()`), `Core/UI/DesignSystem.swift` (`SectionTitle`, `AmountTile`, `PaymentTiles`, `StatusPill`, `EmptyState`, `FilterChips`, `InfoBanner`, `BrandAvatar`, `LoadingCards`). `SyncBadge`, `OfflineNotice`, `FormErrors` sur tokens.
+- **Écrans** : toutes les améliorations du tableau ci-dessus, sur les 14 fichiers de vues.
+- **Logique** : aucun fichier de `Core/API`, `Core/Sync`, `Core/Domain`, `Core/Persistence`, `Core/Auth`, `AppServices.swift`, des tests ni de `server/` modifié. Calculs ajoutés, tous d'affichage : bénéfice net, total du jour, totaux annuels des taxes, compteurs, recherche locale des clients. La suppression par balayage des ventes appelle le même `LocalStore.delete` que la fiche vente.
+- **Vérification** : `xcodebuild build` sans warning dans nos fichiers ; `xcodebuild test` vert, mêmes tests qu'au départ (1 ignoré : `LiveAPITests`, désactivé par défaut). Essai sur iPhone 17 Pro (iOS 27), clair et sombre.
+
+### Corrigé après l'essai sur iPhone
+
+- **Crash** à l'ouverture du formulaire de vente (+ et Modifier) : la première version de `Theme.tint` créait un `UIColor` dynamique dont la closure, isolée au `MainActor`, était résolue par SwiftUI hors du thread principal. Remplacé par `TintStyle`, un `ShapeStyle` SwiftUI qui lit `colorScheme` (12 % en clair, 20 % en sombre).
+- **Barre de synchro** trop présente : masquée quand tout va bien (voir le tableau).
+- **Filtres** : dans une `safeAreaBar`, l'effet de bord flou recouvrait 40 % de l'écran des achats et des taxes ; remis en première ligne de liste. Les ventes utilisaient un segmenté : passées en chips pour avoir le même filtre partout.
+- **Boutons ‹ › du calendrier** trop gros (cercles en verre de 44 pt) : 32 pt comme sur le web.
+- **Tuiles** de paiement et de taxes de hauteurs différentes (la tuile « Total » n'a pas de sous-titre) : hauteur égale.
+- **Ventes** : chevron retiré, suppression par balayage ajoutée.
+- **Icône d'import** Revolut : flèche vers le haut (on envoie le relevé au serveur).
 
 ### Écarts par rapport à la proposition
 
 - Les lignes de `Form` (formulaires, fiche vente) gardent le fond de cellule système : seul le fond de page est teinté. Plus natif, et l'écart avec `LGSurface` est imperceptible.
-- `Theme.tint` passe par `UIColor` pour obtenir 12 % en clair et 20 % en sombre ; non vérifié à l'écran sur les tuiles (seuls les écrans de connexion ont été capturés, clair et sombre).
 - « Vente supprimée » et « Résolu » restent des `ContentUnavailableView` (états de fin, pas des listes vides).
-- Corrigé à la revue : couleur des sur-titres des tuiles (le libellé « Reste » restait gris), en-tête du calendrier (titre, mois et boutons sur deux lignes, « Aujourd'hui » n'hérite plus de la forme circulaire), boutons d'action des conflits vraiment pleine largeur.
 
 ### Reste à faire
 
-- Vérifier sur iPhone, clair et sombre, avec de vraies données (voir la liste de tests dans le rapport).
 - Option : ouvrir l'adresse de livraison dans Plans depuis la fiche vente.
-- Option : `tabBarMinimizeBehavior(.onScrollDown)` avec une version compacte de la barre de synchro.
-
-### Retours après le premier essai sur iPhone
-
-- **Crash** à l'ouverture du formulaire de vente (+ et Modifier) : `Theme.tint` passait par un `UIColor` dynamique dont la closure, isolée au `MainActor`, était résolue hors du thread principal. Remplacé par un `ShapeStyle` SwiftUI (`TintStyle`).
-- **Barre de synchro** : la synchro est automatique, la barre n'apparaît plus que si quelque chose ne va pas (hors ligne, échec, conflits), sur une ligne discrète, sans bouton de synchro (`tabViewBottomAccessory(isEnabled:)`, iOS 26.1).
-- Boutons ‹ › du calendrier à 32 pt comme sur le web (zone de toucher 44 pt) ; plus de chevron sur les ventes ; suppression par balayage sur les ventes ; tuiles de paiement et de taxes à hauteur égale ; filtres (périodes des ventes et années, tous en chips comme sur le web) remis en première ligne de liste : dans une `safeAreaBar`, l'effet de bord flou recouvrait 40 % de l'écran ; icône d'import Revolut avec la flèche vers le haut.
+- Option : confirmation avant la suppression par balayage d'une vente (aujourd'hui immédiate, comme pour les achats et le stock).
