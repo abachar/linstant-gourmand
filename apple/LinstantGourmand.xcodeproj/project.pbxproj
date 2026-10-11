@@ -314,6 +314,7 @@
 				DEVELOPMENT_TEAM = LAG58JZG7G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LinstantGourmand/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "L'Instant Gourmand";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Face ID protège l'accès à vos ventes, achats et stocks.";

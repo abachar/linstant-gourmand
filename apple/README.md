@@ -5,13 +5,21 @@ App SwiftUI native (iOS 26 minimum), utilisable hors ligne, synchronisée avec l
 ## Ouvrir et lancer
 
 1. Ouvrir `apple/LinstantGourmand.xcodeproj` dans Xcode.
-2. Cible **LinstantGourmand** → onglet *Signing & Capabilities* → **Team** : choisir votre « Personal Team » (Apple ID gratuit). Le bundle id est `dev.crafters.linstantgourmand`.
+2. Cible **LinstantGourmand** → onglet *Signing & Capabilities* → **Team** : Crafters (`LAG58JZG7G`). Le bundle id est `dev.crafters.linstant-gourmand`.
 3. Choisir le simulateur ou l'iPhone branché, puis **Run** (⌘R).
 
-### Sur l'iPhone (compte gratuit)
+## Distribuer par TestFlight
 
-- La première fois : *Réglages → Général → VPN et gestion de l'appareil* → faire confiance au développeur.
-- **L'app expire au bout de 7 jours** : la relancer depuis Xcode (iPhone branché ou sur le même Wi-Fi). Les données locales et les modifications non envoyées sont conservées tant que le bundle id et l'équipe ne changent pas.
+L'app est déclarée sur App Store Connect sous le nom « L'Instant Gourmand by Salma ». Les testeurs internes (onglet *TestFlight*) reçoivent chaque build automatiquement.
+
+```bash
+xcodebuild -project LinstantGourmand.xcodeproj -scheme LinstantGourmand -configuration Release \
+  -destination 'generic/platform=iOS' -archivePath build/LG.xcarchive -allowProvisioningUpdates archive
+xcodebuild -exportArchive -archivePath build/LG.xcarchive -exportOptionsPlist ExportOptions.plist \
+  -exportPath build/export -allowProvisioningUpdates
+```
+
+`ExportOptions.plist` (méthode `app-store-connect`, destination `upload`, numéro de build géré par Xcode) est à la racine de `apple/`. Xcode doit être connecté au compte Apple de l'équipe. `ITSAppUsesNonExemptEncryption` est à `NO` dans `Info.plist` (HTTPS seulement), donc pas de question de conformité à l'export.
 
 ## Serveur utilisé
 
