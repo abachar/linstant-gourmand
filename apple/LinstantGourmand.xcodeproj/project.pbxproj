@@ -283,6 +283,7 @@
 				INFOPLIST_FILE = LinstantGourmand/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "L'Instant Gourmand";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Photographier un ticket de caisse pour pré-remplir un achat.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Face ID protège l'accès à vos ventes, achats et stocks.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -317,6 +318,7 @@
 				INFOPLIST_FILE = LinstantGourmand/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "L'Instant Gourmand";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Photographier un ticket de caisse pour pré-remplir un achat.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Face ID protège l'accès à vos ventes, achats et stocks.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;

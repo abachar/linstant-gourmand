@@ -1,8 +1,9 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { runAction } from "@common/errors";
+import { type ActionResult, runAction } from "@common/errors";
 import { deletePurchase, findAllPurchases, findPurchaseById, importPurchasesFromCsv, savePurchase } from "./api.server";
+import { type ReceiptMediaType, type ReceiptScan, ReceiptScanError, scanReceipt } from "./receipt.server";
 import { purchaseInputSchema } from "./schemas";
 
 export async function findAllPurchasesAction(year: number) {
@@ -40,4 +41,17 @@ export async function deletePurchaseByIdAction(id: string, version: number) {
 
 export async function importPurchasesFromCsvAction(content: string) {
 	return importPurchasesFromCsv(content);
+}
+
+/** Reads a receipt photo (base64) and proposes the purchase fields; nothing is saved. */
+export async function scanReceiptAction(image: {
+	data: string;
+	mediaType: ReceiptMediaType;
+}): Promise<ActionResult<ReceiptScan>> {
+	try {
+		return { ok: true, data: await scanReceipt(Buffer.from(image.data, "base64"), image.mediaType) };
+	} catch (e) {
+		if (e instanceof ReceiptScanError) return { ok: false, code: "receipt_scan_failed", message: e.message };
+		throw e;
+	}
 }

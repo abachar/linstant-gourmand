@@ -23,6 +23,7 @@ protocol APIClientProtocol: AnyObject {
 	func updateClient(_ input: ClientUpdateInput) async throws
 	func salePDF(id: UUID, type: PrintType) async throws -> Data
 	func importPurchases(csv: Data) async throws -> Int
+	func scanReceipt(image: Data) async throws -> ReceiptScanDTO
 }
 
 enum AppConfig {
@@ -127,6 +128,10 @@ final class APIClient: APIClientProtocol {
 		return result.inserted
 	}
 
+	func scanReceipt(image: Data) async throws -> ReceiptScanDTO {
+		try await decode(send("POST", "purchases/receipt", body: image, contentType: "image/jpeg", timeout: 90))
+	}
+
 	// MARK: Transport
 
 	private func encode<T: Encodable>(_ value: T) throws -> Data {
@@ -147,7 +152,8 @@ final class APIClient: APIClientProtocol {
 		query: [String: String] = [:],
 		body: Data? = nil,
 		contentType: String = "application/json",
-		authorized: Bool = true
+		authorized: Bool = true,
+		timeout: TimeInterval = 30
 	) async throws -> Data {
 		var components = URLComponents(url: baseURL.appending(path: path), resolvingAgainstBaseURL: false)!
 		if !query.isEmpty {
@@ -155,7 +161,7 @@ final class APIClient: APIClientProtocol {
 		}
 		var request = URLRequest(url: components.url!)
 		request.httpMethod = method
-		request.timeoutInterval = 30
+		request.timeoutInterval = timeout
 		request.setValue("application/json", forHTTPHeaderField: "Accept")
 		if let body {
 			request.httpBody = body

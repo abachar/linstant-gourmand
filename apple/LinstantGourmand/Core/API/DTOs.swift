@@ -215,6 +215,29 @@ nonisolated struct ImportResult: Codable, Sendable {
 	var inserted: Int
 }
 
+/// Proposal made from a receipt photo (POST /purchases/receipt). `date` is a plain "YYYY-MM-DD" (receipts carry no time zone).
+nonisolated struct ReceiptScanDTO: Codable, Hashable, Sendable {
+	struct Item: Codable, Hashable, Sendable {
+		var label: String
+		var quantity: Double?
+		var total: Double?
+	}
+
+	var date: String?
+	var amount: Amount?
+	var description: String?
+	var merchant: String?
+	var items: [Item]
+	var warnings: [String]
+
+	/// "2026-10-09" → that day at noon, local calendar.
+	static func parseDate(_ string: String) -> Date? {
+		let parts = string.split(separator: "-").compactMap { Int($0) }
+		guard parts.count == 3 else { return nil }
+		return Calendar.current.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2], hour: 12))
+	}
+}
+
 nonisolated enum PrintType: String, Sendable {
 	case quote
 	case invoice

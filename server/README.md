@@ -62,6 +62,9 @@ APP_ADMIN_PASSWORD_HEX=YOUR_PASSWORD_HASHED
 # Clé secrète de session (JWT HS256)
 # Générer avec : pnpm dlx auth@latest secret
 SESSION_SECRET_HEX=YOUR_GENERATED_SECRET
+
+# Scan de tickets de caisse par Claude (optionnel) : clé API de https://platform.claude.com
+ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 ## Développement

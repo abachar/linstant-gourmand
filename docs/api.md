@@ -129,3 +129,13 @@ Contient toutes les entités modifiées (y compris supprimées, `deletedAt` rens
 | PUT | `/clients` | `{ oldClientName, oldDeliveryAddress, newClientName, newDeliveryAddress }` → `204` |
 | GET | `/sales/:id/pdf?type=quote\|invoice` | `application/pdf` |
 | POST | `/purchases/import` | corps `text/csv` (export Revolut) → `{ "inserted": 12 }` |
+| POST | `/purchases/receipt` | corps : la photo (`image/jpeg`, `image/png` ou `image/webp`, 5 Mo max) → proposition d'achat, rien n'est enregistré (ci-dessous) |
+
+### Scan de ticket
+
+```json
+{ "date": "2026-10-09" | null, "amount": "35.20" | null, "description": "Metro : Farine, Beurre" | null,
+  "merchant": "Metro" | null, "items": [ { "label": "Farine T55", "quantity": 1, "total": 18.90 } ],
+  "warnings": [ "Le total des lignes (34,10 €) ne correspond pas au total lu (35,20 €)." ] }
+```
+`date` est un jour sans heure (`YYYY-MM-DD`). `warnings` signale une date ou un montant non lus, une somme des lignes différente du total, ou une image qui n'est pas un ticket. Échec de lecture : `400 receipt_scan_failed` (service non configuré, image illisible, service indisponible).

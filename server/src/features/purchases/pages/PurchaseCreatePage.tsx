@@ -1,9 +1,12 @@
 "use client";
 
 import { PageLayout } from "@components/layouts";
+import { TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createPurchaseAction } from "../actions";
+import type { ReceiptScan } from "../receipt.server";
+import { ReceiptScanButton } from "./components";
 
 export const PurchaseCreatePage = () => {
 	const router = useRouter();
@@ -11,6 +14,14 @@ export const PurchaseCreatePage = () => {
 	const [amount, setAmount] = useState("");
 	const [description, setDescription] = useState("");
 	const [isPending, setIsPending] = useState(false);
+	const [warnings, setWarnings] = useState<string[]>([]);
+
+	function applyScan(scan: ReceiptScan) {
+		if (scan.date) setDate(scan.date);
+		if (scan.amount) setAmount(scan.amount);
+		if (scan.description) setDescription(scan.description);
+		setWarnings(scan.warnings);
+	}
 
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -34,6 +45,20 @@ export const PurchaseCreatePage = () => {
 	return (
 		<PageLayout title="Nouvel achat" withCancel={true}>
 			<form onSubmit={handleSubmit} className="space-y-6">
+				<div className="space-y-3">
+					<ReceiptScanButton onScan={applyScan} />
+					{warnings.length > 0 && (
+						<div className="flex gap-2 items-start bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-xl text-sm">
+							<TriangleAlert size={18} className="shrink-0 mt-0.5" />
+							<div className="space-y-1">
+								{warnings.map((w) => (
+									<p key={w}>{w}</p>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
+
 				<div className="space-y-4">
 					<label className="flex flex-col">
 						<p className="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal pb-2">

@@ -43,6 +43,7 @@ final class FakeAPI: APIClientProtocol {
 	func updateClient(_ input: ClientUpdateInput) async throws { throw APIError.network("unexpected") }
 	func salePDF(id: UUID, type: PrintType) async throws -> Data { throw APIError.network("unexpected") }
 	func importPurchases(csv: Data) async throws -> Int { throw APIError.network("unexpected") }
+	func scanReceipt(image: Data) async throws -> ReceiptScanDTO { throw APIError.network("unexpected") }
 }
 
 /// In-memory store + engine + local store, with automatic syncs disabled so tests drive push/pull.

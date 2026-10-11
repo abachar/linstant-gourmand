@@ -167,6 +167,7 @@ struct PurchaseFormView: View {
 	var body: some View {
 		NavigationStack {
 			Form {
+				if purchase == nil { ReceiptScanSection(draft: $draft) }
 				Section {
 					DatePicker("Date", selection: $draft.date, displayedComponents: .date)
 						.environment(\.locale, Formats.locale)

@@ -40,7 +40,7 @@ Pour forcer une autre URL : *Edit Scheme → Run → Arguments* → `-apiBaseURL
 - **Hors ligne** : ventes, achats et stock se créent, se modifient et se suppriment localement (SwiftData, fichiers chiffrés tant que l'iPhone est verrouillé). Les modifications attendent dans une file d'envoi, une seule par élément.
 - **Synchronisation** : au déverrouillage, au retour du réseau, 2 s après une modification, en tirant une liste vers le bas, ou avec le bouton de la barre d'état au-dessus des onglets.
 - **Conflits** : si une vente a été modifiée sur le web pendant que l'iPhone était hors ligne, elle passe « À traiter » (barre d'état et badge) avec une comparaison champ par champ : *Garder la mienne*, *Prendre le serveur* ou *Corriger*.
-- **En ligne uniquement** : devis/factures PDF, import CSV Revolut, modification des clients, statistiques du tableau de bord et taxes (le dernier résultat reste consultable hors ligne).
+- **En ligne uniquement** : devis/factures PDF, import CSV Revolut, scan de ticket de caisse (photo → achat pré-rempli, bouton « Scanner un ticket » du nouvel achat), modification des clients, statistiques du tableau de bord et taxes (le dernier résultat reste consultable hors ligne).
 
 ## Structure
 

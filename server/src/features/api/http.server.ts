@@ -2,6 +2,7 @@ import { ConflictError, ForbiddenError, NotFoundError } from "@common/errors";
 import { zodFields } from "@common/validation";
 import { InvalidCredentialsError, RateLimitError } from "@features/auth/api.server";
 import { InvalidRefreshTokenError, verifyAccessToken } from "@features/auth/api-session.server";
+import { ReceiptScanError } from "@features/purchases/receipt.server";
 import { z } from "zod";
 
 /** JSON helpers and error mapping for /api/v1 (format documented in docs/api.md, "Erreurs"). */
@@ -24,6 +25,7 @@ function toErrorResponse(e: unknown): Response {
 	if (e instanceof ForbiddenError) return apiError(403, "forbidden", e.message);
 	if (e instanceof NotFoundError) return apiError(404, "not_found", e.message);
 	if (e instanceof BadRequestError) return apiError(400, "bad_request", e.message);
+	if (e instanceof ReceiptScanError) return apiError(400, "receipt_scan_failed", e.message);
 	if (e instanceof InvalidCredentialsError) return apiError(401, "invalid_credentials", e.message);
 	if (e instanceof InvalidRefreshTokenError) return apiError(401, "invalid_refresh_token", e.message);
 	if (e instanceof RateLimitError) return apiError(429, "rate_limited", e.message);
