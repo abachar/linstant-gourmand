@@ -42,6 +42,7 @@ final class FakeAPI: APIClientProtocol {
 	func clients() async throws -> [ClientDTO] { throw APIError.network("unexpected") }
 	func updateClient(_ input: ClientUpdateInput) async throws { throw APIError.network("unexpected") }
 	func salePDF(id: UUID, type: PrintType) async throws -> Data { throw APIError.network("unexpected") }
+	func salesPDF(ids: [UUID], type: PrintType) async throws -> Data { throw APIError.network("unexpected") }
 	func importPurchases(csv: Data) async throws -> Int { throw APIError.network("unexpected") }
 	func scanReceipt(image: Data) async throws -> ReceiptScanDTO { throw APIError.network("unexpected") }
 }

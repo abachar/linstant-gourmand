@@ -172,6 +172,7 @@ Tests Vitest : création, mise à jour, conflit, envoi rejoué, suppression puis
 | PUT / DELETE | `/purchases/:id` | Idem | ✅ |
 | PUT / DELETE | `/products/:id` | Idem | ✅ |
 | GET | `/sales/:id/pdf?type=quote\|invoice` | PDF devis/facture | ❌ |
+| GET | `/sales/pdf?ids=a,b&type=invoice` | Facture groupée (même client, même mois) | ❌ |
 | POST | `/purchases/import` | CSV Revolut (multipart) | ❌ |
 | GET | `/clients` | Liste dérivée des ventes | lecture du cache |
 | PUT | `/clients` | Renommer / changer l'adresse | ❌ |

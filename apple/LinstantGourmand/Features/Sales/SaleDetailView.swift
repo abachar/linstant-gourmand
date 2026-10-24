@@ -8,6 +8,7 @@ struct SaleDetailView: View {
 	@Environment(AppServices.self) private var services
 	@Environment(\.dismiss) private var dismiss
 	@Query private var matches: [Sale]
+	@Query(sort: \Sale.deliveryDatetime) private var allSales: [Sale]
 	@State private var isEditing = false
 	@State private var confirmsDeletion = false
 	@State private var previewURL: URL?
@@ -116,6 +117,14 @@ struct SaleDetailView: View {
 				Section {
 					SalePDFButton(saleId: sale.id, clientName: sale.clientName, type: .quote, previewURL: $previewURL, error: $error)
 					SalePDFButton(saleId: sale.id, clientName: sale.clientName, type: .invoice, previewURL: $previewURL, error: $error)
+					if InvoiceGrouping.candidates(for: sale, in: allSales).count > 1 {
+						NavigationLink {
+							GroupedInvoiceView(sale: sale)
+						} label: {
+							Label("Facture groupée du mois", systemImage: "doc.on.doc")
+						}
+						.disabled(!services.isOnline)
+					}
 				} header: {
 					Text("Documents").overline()
 				} footer: {

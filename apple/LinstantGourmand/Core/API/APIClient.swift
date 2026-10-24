@@ -22,6 +22,8 @@ protocol APIClientProtocol: AnyObject {
 	func clients() async throws -> [ClientDTO]
 	func updateClient(_ input: ClientUpdateInput) async throws
 	func salePDF(id: UUID, type: PrintType) async throws -> Data
+	/// One document for several sales of a client delivered the same month (docs/api.md, "Facture groupée").
+	func salesPDF(ids: [UUID], type: PrintType) async throws -> Data
 	func importPurchases(csv: Data) async throws -> Int
 	func scanReceipt(image: Data) async throws -> ReceiptScanDTO
 }
@@ -121,6 +123,10 @@ final class APIClient: APIClientProtocol {
 
 	func salePDF(id: UUID, type: PrintType) async throws -> Data {
 		try await send("GET", "sales/\(id.apiString)/pdf", query: ["type": type.rawValue])
+	}
+
+	func salesPDF(ids: [UUID], type: PrintType) async throws -> Data {
+		try await send("GET", "sales/pdf", query: ["ids": ids.map(\.apiString).joined(separator: ","), "type": type.rawValue])
 	}
 
 	func importPurchases(csv: Data) async throws -> Int {

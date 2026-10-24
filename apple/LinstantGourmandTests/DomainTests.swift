@@ -131,3 +131,34 @@ struct DTOTests {
 		#expect(APIError.from(status: 503, body: Data()).isTransient)
 	}
 }
+
+struct InvoiceGroupingTests {
+	private func sale(_ client: String, _ day: String, items: Bool = true, pendingDeletion: Bool = false) -> Sale {
+		let sale = Sale(dto: makeSaleDTO(version: 1, clientName: client))
+		sale.deliveryDatetime = ISO8601DateFormatter().date(from: "\(day)T12:00:00Z")!
+		sale.items = items ? [SaleItemDTO(description: "Mini-quiches", unitPrice: Amount(Decimal(string: "1.50")!), quantity: 80)] : []
+		sale.isPendingDeletion = pendingDeletion
+		return sale
+	}
+
+	@Test func keepsSameClientSameMonthWithItems() {
+		let base = sale("Dupont", "2026-10-20")
+		let all = [
+			sale("Dupont", "2026-10-28"),
+			base,
+			sale("Dupont", "2026-10-03"),
+			sale("Martin", "2026-10-10"),
+			sale("Dupont", "2026-11-01"),
+			sale("Dupont", "2026-10-15", items: false),
+			sale("Dupont", "2026-10-16", pendingDeletion: true),
+		]
+		let candidates = InvoiceGrouping.candidates(for: base, in: all, calendar: utc)
+		#expect(candidates.map { utc.component(.day, from: $0.deliveryDatetime) } == [3, 20, 28])
+	}
+
+	private var utc: Calendar {
+		var calendar = Calendar(identifier: .gregorian)
+		calendar.timeZone = TimeZone(identifier: "UTC")!
+		return calendar
+	}
+}
