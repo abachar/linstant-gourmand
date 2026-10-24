@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { runAction } from "@common/errors";
 import { addDays, addYears, endOfDay, endOfMonth, startOfDay, startOfMonth, subDays } from "date-fns";
 import { deleteSale, findSaleById, findSalesByRange, getDistinctClients, saveSale } from "./api.server";
+import { findInvoiceCandidates } from "./invoice.server";
 import { saleInputSchema } from "./schemas";
 
 function validFilter(filter: string) {
@@ -50,6 +51,13 @@ export async function findSaleByIdAction(id: string) {
 }
 
 export type FindSaleByIdReturn = NonNullable<Awaited<ReturnType<typeof findSaleByIdAction>>>;
+
+/** The sales that can share a grouped invoice with this one (same client, same month, with items). */
+export async function findInvoiceCandidatesAction(id: string) {
+	return findInvoiceCandidates(id);
+}
+
+export type FindInvoiceCandidatesReturn = NonNullable<Awaited<ReturnType<typeof findInvoiceCandidatesAction>>>;
 
 type SaleFormData = {
 	clientName: string;

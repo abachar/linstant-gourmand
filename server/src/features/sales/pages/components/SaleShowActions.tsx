@@ -2,11 +2,13 @@
 
 import { deleteSaleByIdAction, type FindSaleByIdReturn } from "@features/sales";
 import { useMutation } from "@tanstack/react-query";
-import { FileText, Pencil, Trash2 } from "lucide-react";
+import { FileStack, FileText, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export const SaleShowActions = ({ sale }: { sale: FindSaleByIdReturn }) => {
+type SaleShowActionsProps = { sale: FindSaleByIdReturn; canGroupInvoice: boolean };
+
+export const SaleShowActions = ({ sale, canGroupInvoice }: SaleShowActionsProps) => {
 	const router = useRouter();
 
 	const { mutate: deleteSale } = useMutation({
@@ -54,6 +56,14 @@ export const SaleShowActions = ({ sale }: { sale: FindSaleByIdReturn }) => {
 						<FileText size={18} /> Facture
 					</a>
 				))}
+			{canGroupInvoice && (
+				<Link
+					href={`/sales/${sale.id}/invoice`}
+					className="col-span-2 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-sm flex items-center justify-center gap-2"
+				>
+					<FileStack size={18} /> Facture groupée du mois
+				</Link>
+			)}
 		</div>
 	);
 };
