@@ -128,8 +128,13 @@ Contient toutes les entités modifiées (y compris supprimées, `deletedAt` rens
 | GET | `/clients` | `[{ clientName, deliveryAddress, orderCount, totalAmount }]` |
 | PUT | `/clients` | `{ oldClientName, oldDeliveryAddress, newClientName, newDeliveryAddress }` → `204` |
 | GET | `/sales/:id/pdf?type=quote\|invoice` | `application/pdf` |
+| GET | `/sales/pdf?ids=a,b,c&type=quote\|invoice` | `application/pdf` : facture groupée de plusieurs ventes (ci-dessous) |
 | POST | `/purchases/import` | corps `text/csv` (export Revolut) → `{ "inserted": 12 }` |
 | POST | `/purchases/receipt` | corps : la photo (`image/jpeg`, `image/png` ou `image/webp`, 5 Mo max) → proposition d'achat, rien n'est enregistré (ci-dessous) |
+
+### Facture groupée
+
+`ids` : identifiants séparés par des virgules, 20 au plus. Les ventes doivent toutes exister (`404`), avoir des articles, être du **même client** et livrées le **même mois** (`400 bad_request` sinon). Le PDF reprend l'en-tête habituel, une section par événement (date, adresse, articles, sous-total) et le total général. Rien n'est enregistré : la facture est rendue à la demande.
 
 ### Scan de ticket
 

@@ -8,7 +8,8 @@ function getDb() {
 
 	return drizzle(process.env.DATABASE_URL, {
 		schema: { sales, saleItems, purchases, products, apiSessions },
-		logger: process.env.NODE_ENV !== "production",
+		// Query log in `next dev` only (NODE_ENV is "test" under vitest, "production" in the container).
+		logger: process.env.NODE_ENV === "development",
 	});
 }
 

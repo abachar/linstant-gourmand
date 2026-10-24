@@ -15,6 +15,14 @@ export class NotFoundError extends Error {
 	}
 }
 
+/** Malformed or inconsistent request (invalid parameter, sales that cannot share an invoice…). */
+export class BadRequestError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "BadRequestError";
+	}
+}
+
 export class ForbiddenError extends Error {
 	constructor(message: string) {
 		super(message);
@@ -44,9 +52,9 @@ export async function runAction<T>(fn: () => Promise<T>): Promise<ActionResult<T
 		if (e instanceof ZodError) {
 			return { ok: false, code: "validation", message: e.issues.map((i) => i.message).join("\n") };
 		}
-		if (e instanceof ForbiddenError || e instanceof NotFoundError) {
-			return { ok: false, code: e instanceof ForbiddenError ? "forbidden" : "not_found", message: e.message };
-		}
+		if (e instanceof ForbiddenError) return { ok: false, code: "forbidden", message: e.message };
+		if (e instanceof NotFoundError) return { ok: false, code: "not_found", message: e.message };
+		if (e instanceof BadRequestError) return { ok: false, code: "bad_request", message: e.message };
 		throw e;
 	}
 }

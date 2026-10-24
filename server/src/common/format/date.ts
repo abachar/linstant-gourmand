@@ -32,6 +32,8 @@ const dateLongFormatter = new Intl.DateTimeFormat(LOCALE, {
 	year: "numeric",
 });
 
+const monthYearFormatter = new Intl.DateTimeFormat(LOCALE, { month: "long", year: "numeric" });
+
 const datetimeLongFormatter = new Intl.DateTimeFormat(LOCALE, {
 	weekday: "long",
 	day: "numeric",
@@ -49,6 +51,11 @@ export function dateShort(date: Date | string): string {
 /** samedi 25 janvier 2025 */
 export function dateLong(date: Date | string): string {
 	return dateLongFormatter.format(new Date(date));
+}
+
+/** janvier 2025 */
+export function monthYear(date: Date | string): string {
+	return monthYearFormatter.format(new Date(date));
 }
 
 /** samedi 25 janvier 2025 à 14h30 */

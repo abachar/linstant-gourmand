@@ -10,6 +10,7 @@ import * as products from "@/app/api/v1/products/[id]/route";
 import * as purchases from "@/app/api/v1/purchases/[id]/route";
 import * as purchasesImport from "@/app/api/v1/purchases/import/route";
 import * as sales from "@/app/api/v1/sales/[id]/route";
+import * as salesPdf from "@/app/api/v1/sales/pdf/route";
 import * as sync from "@/app/api/v1/sync/route";
 import { TEST_ADMIN_EMAIL, TEST_ADMIN_PASSWORD } from "./setup";
 
@@ -30,8 +31,9 @@ async function call(handler: Handler, method: string, path: string, body?: unkno
 		body: body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(body),
 	});
 	const response = await handler(request, { params: Promise.resolve(params) as Promise<never> });
-	const text = await response.text();
-	return { status: response.status, json: text ? JSON.parse(text) : null };
+	const contentType = response.headers.get("content-type") ?? "";
+	const text = contentType.includes("json") ? await response.text() : "";
+	return { status: response.status, json: text ? JSON.parse(text) : null, contentType };
 }
 
 const saleInput = (overrides: Record<string, unknown> = {}) => ({
@@ -181,6 +183,51 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)("API /api/v1", () => {
 			const edit = await putSale(id, { baseVersion: deleted.json.version, ...saleInput() });
 			expect(edit.status).toBe(409);
 			expect(edit.json.current.deletedAt).not.toBeNull();
+		});
+
+		describe("facture groupée", () => {
+			const createSale = async (overrides: Record<string, unknown> = {}) => {
+				const id = randomUUID();
+				expect((await putSale(id, { baseVersion: null, ...saleInput(overrides) })).status).toBe(200);
+				return id;
+			};
+			const groupedPdf = (ids: string[], type = "invoice") =>
+				call(salesPdf.GET, "GET", `/sales/pdf?ids=${ids.join(",")}&type=${type}`);
+
+			it("rend un PDF pour des ventes du même client livrées le même mois", async () => {
+				const first = await createSale({ deliveryDatetime: "2026-11-03T10:00:00.000Z" });
+				const second = await createSale({ deliveryDatetime: "2026-11-28T18:00:00.000Z" });
+				const { status, contentType } = await groupedPdf([first, second]);
+				expect(status).toBe(200);
+				expect(contentType).toBe("application/pdf");
+			});
+
+			it("refuse des clients ou des mois différents, et une vente sans articles", async () => {
+				const base = await createSale();
+				const otherClient = await createSale({ clientName: "Martin" });
+				const otherMonth = await createSale({ deliveryDatetime: "2026-12-01T10:00:00.000Z" });
+				const noItems = await createSale({ items: [] });
+
+				for (const other of [otherClient, otherMonth, noItems]) {
+					const { status, json } = await groupedPdf([base, other]);
+					expect(status).toBe(400);
+					expect(json.error.code).toBe("bad_request");
+				}
+			});
+
+			it("répond 404 pour une vente inconnue ou supprimée", async () => {
+				const base = await createSale();
+				expect((await groupedPdf([base, randomUUID()])).status).toBe(404);
+
+				const deleted = await createSale();
+				await call(sales.DELETE, "DELETE", `/sales/${deleted}?baseVersion=1`, undefined, { id: deleted });
+				expect((await groupedPdf([base, deleted])).status).toBe(404);
+			});
+
+			it("valide le paramètre ids", async () => {
+				expect((await call(salesPdf.GET, "GET", "/sales/pdf")).status).toBe(400);
+				expect((await groupedPdf(["pas-un-uuid"])).status).toBe(400);
+			});
 		});
 
 		it("détecte un conflit côté web (Server Action)", async () => {

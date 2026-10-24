@@ -1,4 +1,4 @@
-import { ConflictError, ForbiddenError, NotFoundError } from "@common/errors";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "@common/errors";
 import { zodFields } from "@common/validation";
 import { InvalidCredentialsError, RateLimitError } from "@features/auth/api.server";
 import { InvalidRefreshTokenError, verifyAccessToken } from "@features/auth/api-session.server";
@@ -7,7 +7,7 @@ import { z } from "zod";
 
 /** JSON helpers and error mapping for /api/v1 (format documented in docs/api.md, "Erreurs"). */
 
-export class BadRequestError extends Error {}
+export { BadRequestError };
 
 type ErrorExtra = { fields?: Record<string, string>; current?: unknown };
 

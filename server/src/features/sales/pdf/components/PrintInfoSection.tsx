@@ -1,17 +1,20 @@
-import { dateShort } from "@common/format";
+import { dateShort, monthYear } from "@common/format";
 import { Text, View } from "@react-pdf/renderer";
 
 interface PrintInfoSectionProps {
 	clientName: string;
 	isInvoice: boolean;
+	/** A date of the invoiced month, for a grouped invoice. */
+	period: Date | null;
 }
 
-export const PrintInfoSection = ({ clientName, isInvoice }: PrintInfoSectionProps) => (
+export const PrintInfoSection = ({ clientName, isInvoice, period }: PrintInfoSectionProps) => (
 	<>
 		<View style={{ marginBottom: 4 }}>
 			<Text style={{ fontSize: 10, marginBottom: 4 }}>
 				{isInvoice ? "Date de la facture" : "Date du devis"} : {dateShort(new Date())}
 			</Text>
+			{period && <Text style={{ fontSize: 10, marginBottom: 4 }}>Période : {monthYear(period)}</Text>}
 			{!isInvoice && <Text style={{ fontSize: 10, marginBottom: 4 }}>Validité du devis : 72h</Text>}
 		</View>
 

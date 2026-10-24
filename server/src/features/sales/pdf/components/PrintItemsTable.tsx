@@ -1,18 +1,14 @@
 import { amount as formatAmount } from "@common/format";
 import { Text, View } from "@react-pdf/renderer";
-
-interface PrintItem {
-	id: string;
-	description: string;
-	unitPrice: string;
-	quantity: number;
-}
+import { itemsTotal, type PrintItem } from "../types";
 
 interface PrintItemsTableProps {
 	items: PrintItem[];
+	/** "Total :" for a single sale, "Sous-total :" inside a grouped invoice. */
+	totalLabel: string;
 }
 
-export const PrintItemsTable = ({ items }: PrintItemsTableProps) => (
+export const PrintItemsTable = ({ items, totalLabel }: PrintItemsTableProps) => (
 	<>
 		<View style={{ marginBottom: 20 }}>
 			<View
@@ -35,6 +31,7 @@ export const PrintItemsTable = ({ items }: PrintItemsTableProps) => (
 				return (
 					<View
 						key={item.id}
+						wrap={false}
 						style={{
 							flexDirection: "row",
 							borderBottomWidth: 1,
@@ -53,11 +50,12 @@ export const PrintItemsTable = ({ items }: PrintItemsTableProps) => (
 			})}
 		</View>
 
-		<View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10, paddingRight: 8 }}>
-			<Text style={{ fontSize: 12, fontWeight: "bold", marginRight: 20 }}>Total :</Text>
-			<Text style={{ fontSize: 12, fontWeight: "bold" }}>
-				{formatAmount(items.reduce((sum, item) => sum + Number.parseFloat(item.unitPrice) * item.quantity, 0))}
-			</Text>
+		<View
+			wrap={false}
+			style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10, marginBottom: 20, paddingRight: 8 }}
+		>
+			<Text style={{ fontSize: 12, fontWeight: "bold", marginRight: 20 }}>{totalLabel}</Text>
+			<Text style={{ fontSize: 12, fontWeight: "bold" }}>{formatAmount(itemsTotal(items))}</Text>
 		</View>
 	</>
 );

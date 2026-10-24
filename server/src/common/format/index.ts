@@ -8,4 +8,5 @@ export {
 	formatDatetimeLocal,
 	getMonthName,
 	MONTHS,
+	monthYear,
 } from "./date";

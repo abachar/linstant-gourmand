@@ -9,5 +9,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 	}
 
 	const isInvoice = new URL(request.url).searchParams.get("type") === "invoice";
-	return renderSalePdf(sale, isInvoice);
+	return renderSalePdf([sale], isInvoice);
 }
