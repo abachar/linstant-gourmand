@@ -1,6 +1,5 @@
-import { amount as formatAmount } from "@common/format";
 import { Text, View } from "@react-pdf/renderer";
-import { itemsTotal, type PrintItem } from "../types";
+import { itemsTotal, type PrintItem, printAmount } from "../types";
 
 interface PrintItemsTableProps {
 	items: PrintItem[];
@@ -42,9 +41,9 @@ export const PrintItemsTable = ({ items, totalLabel }: PrintItemsTableProps) => 
 						}}
 					>
 						<Text style={{ flex: 3 }}>{item.description}</Text>
-						<Text style={{ flex: 1, textAlign: "center" }}>{formatAmount(item.unitPrice)}</Text>
+						<Text style={{ flex: 1, textAlign: "center" }}>{printAmount(item.unitPrice)}</Text>
 						<Text style={{ flex: 1, textAlign: "center" }}>{item.quantity}</Text>
-						<Text style={{ flex: 1, textAlign: "right" }}>{formatAmount(lineTotal)}</Text>
+						<Text style={{ flex: 1, textAlign: "right" }}>{printAmount(lineTotal)}</Text>
 					</View>
 				);
 			})}
@@ -55,7 +54,7 @@ export const PrintItemsTable = ({ items, totalLabel }: PrintItemsTableProps) => 
 			style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10, marginBottom: 20, paddingRight: 8 }}
 		>
 			<Text style={{ fontSize: 12, fontWeight: "bold", marginRight: 20 }}>{totalLabel}</Text>
-			<Text style={{ fontSize: 12, fontWeight: "bold" }}>{formatAmount(itemsTotal(items))}</Text>
+			<Text style={{ fontSize: 12, fontWeight: "bold" }}>{printAmount(itemsTotal(items))}</Text>
 		</View>
 	</>
 );
