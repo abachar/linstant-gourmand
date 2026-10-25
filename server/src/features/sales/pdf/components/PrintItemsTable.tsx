@@ -3,11 +3,9 @@ import { itemsTotal, type PrintItem, printAmount } from "../types";
 
 interface PrintItemsTableProps {
 	items: PrintItem[];
-	/** "Total :" for a single sale, "Sous-total :" inside a grouped invoice. */
-	totalLabel: string;
 }
 
-export const PrintItemsTable = ({ items, totalLabel }: PrintItemsTableProps) => (
+export const PrintItemsTable = ({ items }: PrintItemsTableProps) => (
 	<>
 		<View style={{ marginBottom: 20 }}>
 			<View
@@ -49,11 +47,8 @@ export const PrintItemsTable = ({ items, totalLabel }: PrintItemsTableProps) => 
 			})}
 		</View>
 
-		<View
-			wrap={false}
-			style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10, marginBottom: 20, paddingRight: 8 }}
-		>
-			<Text style={{ fontSize: 12, fontWeight: "bold", marginRight: 20 }}>{totalLabel}</Text>
+		<View wrap={false} style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10, paddingRight: 8 }}>
+			<Text style={{ fontSize: 12, fontWeight: "bold", marginRight: 20 }}>Total :</Text>
 			<Text style={{ fontSize: 12, fontWeight: "bold" }}>{printAmount(itemsTotal(items))}</Text>
 		</View>
 	</>

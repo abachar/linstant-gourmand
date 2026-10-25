@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { dateLong, dateShort, datetimeLong, formatDateInput, formatDatetimeLocal, monthYear } from "./date";
+import {
+	dateCompact,
+	dateLong,
+	dateShort,
+	datetimeLong,
+	formatDateInput,
+	formatDatetimeLocal,
+	monthYear,
+} from "./date";
 
 // Tests with UTC noon to avoid timezone-dependent day shifts (TZ=UTC configured in vitest.config.ts)
 const JAN_25_2025 = "2025-01-25T12:00:00Z"; // samedi
@@ -22,6 +30,12 @@ describe("dateLong", () => {
 
 	it("accepte un objet Date", () => {
 		expect(dateLong(new Date(JAN_25_2025))).toBe("samedi 25 janvier 2025");
+	});
+});
+
+describe("dateCompact", () => {
+	it("abrège le jour et le mois", () => {
+		expect(dateCompact(JAN_25_2025)).toBe("sam. 25 janv.");
 	});
 });
 

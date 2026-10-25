@@ -2,7 +2,7 @@ import { Document, Font, Page } from "@react-pdf/renderer";
 import {
 	PrintEventLine,
 	PrintFooter,
-	PrintGrandTotal,
+	PrintGroupedItemsTable,
 	PrintHeader,
 	PrintInfoSection,
 	PrintItemsTable,
@@ -33,12 +33,13 @@ export const SalePrintDocument = ({ sales, isInvoice = false }: SalePrintDocumen
 					isInvoice={isInvoice}
 					period={grouped ? first.deliveryDatetime : null}
 				/>
-				{sales.map((sale) => (
-					<PrintEventLine key={sale.id} datetime={sale.deliveryDatetime} address={sale.deliveryAddress}>
-						<PrintItemsTable items={sale.items} totalLabel={grouped ? "Sous-total :" : "Total :"} />
+				{grouped ? (
+					<PrintGroupedItemsTable sales={sales} />
+				) : (
+					<PrintEventLine datetime={first.deliveryDatetime} address={first.deliveryAddress}>
+						<PrintItemsTable items={first.items} />
 					</PrintEventLine>
-				))}
-				{grouped && <PrintGrandTotal sales={sales} />}
+				)}
 				<PrintFooter />
 			</Page>
 		</Document>

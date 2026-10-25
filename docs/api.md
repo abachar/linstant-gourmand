@@ -134,7 +134,7 @@ Contient toutes les entités modifiées (y compris supprimées, `deletedAt` rens
 
 ### Facture groupée
 
-`ids` : identifiants séparés par des virgules, 20 au plus. Les ventes doivent toutes exister (`404`), avoir des articles, être du **même client** et livrées le **même mois** (`400 bad_request` sinon). Le PDF reprend l'en-tête habituel, une section par événement (date, adresse, articles, sous-total) et le total général. Rien n'est enregistré : la facture est rendue à la demande.
+`ids` : identifiants séparés par des virgules, 20 au plus. Les ventes doivent toutes exister (`404`), avoir des articles, être du **même client** et livrées le **même mois** (`400 bad_request` sinon). Le PDF reprend l'en-tête habituel, l'adresse de livraison la plus fréquente, puis un seul tableau avec une colonne date (les livraisons faites ailleurs indiquent leur adresse) et le total général. Rien n'est enregistré : la facture est rendue à la demande.
 
 ### Scan de ticket
 

@@ -16,7 +16,7 @@ export const PrintGrandTotal = ({ sales }: { sales: PrintSale[] }) => (
 			marginTop: 10,
 		}}
 	>
-		<Text style={{ fontSize: 10, color: "#666", marginRight: 20 }}>{sales.length} événements</Text>
+		<Text style={{ fontSize: 10, color: "#666", marginRight: 20 }}>{sales.length} livraisons</Text>
 		<Text style={{ fontSize: 14, fontWeight: "bold", marginRight: 20 }}>Total :</Text>
 		<Text style={{ fontSize: 14, fontWeight: "bold" }}>
 			{printAmount(sales.reduce((sum, sale) => sum + itemsTotal(sale.items), 0))}
